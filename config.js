@@ -90,7 +90,7 @@ export const WHITELIST_DOMAINS = [
  * plus the 8 custom Urban Brim obfuscated params.
  * @type {RegExp}
  */
-export const TRACKING_PARAM_REGEX = /^(utm_\w+|fbclid|gclid|dclid|msclkid|twclid|ttclid|clickid|IRID|_ga|_gl|mc_[ce]id|yclid|_openstat|ref|referrer|tracking_id|gad_\w+|wbraid|gbraid|singular_click_id|sl_id|pcn|_fallback_redirect|android_dl|deeplink|adjust_\w+|branch_\w+|af_\w+|mfadid|adid|admclid|partner|veh|camref|creativeref|pubref|ir_\w+|irgwc|afsrc|sharedid|sid|cc4d76fdaf5|a0v5la7bquf89|uy3ubftvh0u6o8|cusduxj27i|xnfrr0ncac|zsmoi87pih9|lzzgnpz8d|Q09ORklH|igshid|share_id|share_source|share_app_id)$/i;
+export const TRACKING_PARAM_REGEX = /^(utm_\w+|fbclid|gclid|dclid|msclkid|twclid|ttclid|clickid|IRID|_ga|_gl|mc_[ce]id|yclid|_openstat|ref|referrer|tracking_id|gad_\w+|wbraid|gbraid|singular_click_id|sl_id|pcn|_fallback_redirect|android_dl|deeplink|adjust_\w+|branch_\w+|af_\w+|mfadid|adid|admclid|partner|veh|camref|creativeref|pubref|ir_\w+|irgwc|afsrc|sharedid|sid|ncid|soc_src|soc_trk|cc4d76fdaf5|a0v5la7bquf89|uy3ubftvh0u6o8|cusduxj27i|xnfrr0ncac|zsmoi87pih9|lzzgnpz8d|Q09ORklH|igshid|share_id|share_source|share_app_id)$/i;
 
 /**
  * Domain-specific tracking params. Only stripped when the URL matches the domain.
