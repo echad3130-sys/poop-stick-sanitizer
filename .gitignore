@@ -1,0 +1,58 @@
+# Minnow OS / Poop Stick Sanitizer
+# .gitignore — mask sensitive data, never commit secrets
+
+# ─── Secrets & Auth ────────────────────────────────────
+*.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+tokens.json
+auth.json
+secrets.json
+credentials.json
+
+# ─── API Keys & Tokens (salt these, never raw) ────────
+*.token
+*.secret
+oauth-*.json
+gh-auth.json
+
+# ─── Node / NPM ───────────────────────────────────────
+node_modules/
+package-lock.json
+npm-debug.log*
+.npm
+
+# ─── Build / Dist ─────────────────────────────────────
+dist/
+release/
+*.exe
+*.msi
+
+# ─── OS Files ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*~
+
+# ─── IDE ──────────────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-*
+
+# ─── Logs ─────────────────────────────────────────────
+*.log
+logs/
+
+# ─── Inno Setup output ───────────────────────────────
+Output/
+*.iss.bak
+
+# ─── Database / State ────────────────────────────────
+*.sqlite
+*.db
+mast-ledger.json
+snapshots/
