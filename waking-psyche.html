@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUPER DE@D DUDES — Waking Psyche</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(28px, 6vw, 72px);
+      color: #fff;
+      text-shadow: 0 0 40px rgba(0,255,180,0.5), 0 0 80px rgba(0,200,255,0.3);
+      letter-spacing: 0.1em;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 2s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .title.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .subtitle {
+      font-size: clamp(12px, 2vw, 20px);
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      margin-top: 12px;
+      opacity: 0;
+      transition: opacity 3s ease 1s;
+    }
+
+    .subtitle.visible { opacity: 1; }
+
+    .phase-text {
+      position: fixed;
+      bottom: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      font-size: clamp(10px, 1.8vw, 16px);
+      color: rgba(255,200,100,0.7);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      font-weight: 300;
+      opacity: 0;
+      transition: opacity 1s ease;
+      pointer-events: none;
+    }
+
+    .phase-text.visible { opacity: 1; }
+
+    .btn-start {
+      position: fixed;
+      bottom: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.7);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 12px 32px;
+      cursor: pointer;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      transition: all 0.5s;
+    }
+
+    .btn-start:hover {
+      border-color: rgba(0,255,180,0.6);
+      color: #fff;
+      box-shadow: 0 0 30px rgba(0,255,180,0.2);
+    }
+
+    .btn-start.hidden { opacity: 0; pointer-events: none; }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.8) 100%);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div class="overlay">
+    <div class="title" id="title">SUPER DE@D DUDES</div>
+    <div class="subtitle" id="subtitle">Waking Psyche</div>
+  </div>
+  <div class="phase-text" id="phaseText"></div>
+  <button class="btn-start" id="btnStart" onclick="beginSequence()">AWAKEN</button>
+  <div class="vignette"></div>
+
+<script>
+// =============================================================================
+// WAKING PSYCHE — Resurrection Animation Engine
+// Phases: Dry Bones → Wake Me Up Inside → Give Life → Sonic Calling → Psyche
+// =============================================================================
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H, cx, cy;
+let animFrame;
+let phase = 0; // 0=dormant, 1=dry bones, 2=wake, 3=give life, 4=sonic, 5=psyche
+let phaseTime = 0;
+let globalTime = 0;
+let particles = [];
+let bones = [];
+let sonicRings = [];
+let butterflies = [];
+let started = false;
+
+const PHASES = [
+  { name: 'DORMANT', duration: 0 },
+  { name: 'DRY BONES', duration: 4000 },
+  { name: 'WAKE ME UP INSIDE', duration: 4000 },
+  { name: 'GIVE LIFE', duration: 3500 },
+  { name: 'SONIC CALLING', duration: 4000 },
+  { name: 'WAKING PSYCHE', duration: 5000 }
+];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  cx = W / 2;
+  cy = H / 2;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// --- BONE SYSTEM ---
+class Bone {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    // Start scattered on the ground
+    this.groundX = cx + (Math.random() - 0.5) * W * 0.6;
+    this.groundY = cy + H * 0.15 + Math.random() * H * 0.15;
+    this.x = this.groundX;
+    this.y = this.groundY;
+    // Target: form skeleton silhouette
+    this.targetX = cx + (Math.random() - 0.5) * 80;
+    this.targetY = cy + (Math.random() - 0.5) * 200 - 40;
+    this.len = 15 + Math.random() * 35;
+    this.angle = Math.random() * Math.PI * 2;
+    this.targetAngle = (Math.random() - 0.5) * 0.8;
+    this.assembled = false;
+    this.brightness = 0.3 + Math.random() * 0.3;
+    this.glowIntensity = 0;
+    this.width = 2 + Math.random() * 3;
+  }
+
+  update(progress) {
+    if (progress > 0.1) {
+      const t = Math.min(1, (progress - 0.1) / 0.7);
+      const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      this.x = this.groundX + (this.targetX - this.groundX) * ease;
+      this.y = this.groundY + (this.targetY - this.groundY) * ease;
+      this.angle = this.angle + (this.targetAngle - this.angle) * ease;
+      this.assembled = t > 0.8;
+    }
+    // Glow when assembled
+    this.glowIntensity = this.assembled ? Math.min(1, this.glowIntensity + 0.02) : this.glowIntensity * 0.98;
+  }
+
+  draw() {
+    const dx = Math.cos(this.angle) * this.len / 2;
+    const dy = Math.sin(this.angle) * this.len / 2;
+
+    ctx.beginPath();
+    ctx.moveTo(this.x - dx, this.y - dy);
+    ctx.lineTo(this.x + dx, this.y + dy);
+    ctx.strokeStyle = `rgba(220,200,170,${this.brightness + this.glowIntensity * 0.5})`;
+    ctx.lineWidth = this.width;
+    ctx.lineCap = 'round';
+
+    if (this.glowIntensity > 0.1) {
+      ctx.shadowColor = `rgba(0,255,180,${this.glowIntensity * 0.6})`;
+      ctx.shadowBlur = 20 * this.glowIntensity;
+    } else {
+      ctx.shadowBlur = 0;
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Joint dots
+    ctx.beginPath();
+    ctx.arc(this.x - dx, this.y - dy, this.width * 0.8, 0, Math.PI * 2);
+    ctx.arc(this.x + dx, this.y + dy, this.width * 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200,180,150,${this.brightness * 0.8})`;
+    ctx.fill();
+  }
+}
+
+// --- PARTICLE SYSTEM ---
+class Particle {
+  constructor(x, y, type) {
+    this.x = x;
+    this.y = y;
+    this.type = type; // 'dust', 'spark', 'soul', 'energy'
+    this.vx = (Math.random() - 0.5) * 2;
+    this.vy = -Math.random() * 3 - 0.5;
+    this.life = 1;
+    this.maxLife = 60 + Math.random() * 120;
+    this.age = 0;
+    this.size = type === 'spark' ? 1 + Math.random() * 2
+              : type === 'soul' ? 3 + Math.random() * 4
+              : type === 'energy' ? 2 + Math.random() * 3
+              : 1 + Math.random() * 2;
+  }
+
+  update() {
+    this.age++;
+    this.life = 1 - this.age / this.maxLife;
+    if (this.type === 'soul') {
+      this.vy -= 0.02;
+      this.vx += Math.sin(this.age * 0.05) * 0.1;
+    } else if (this.type === 'energy') {
+      this.vx *= 0.98;
+      this.vy *= 0.98;
+    }
+    this.x += this.vx;
+    this.y += this.vy;
+    return this.life > 0;
+  }
+
+  draw() {
+    const alpha = this.life * (this.type === 'dust' ? 0.4 : 0.8);
+    let color;
+    switch (this.type) {
+      case 'dust': color = `rgba(180,160,130,${alpha})`; break;
+      case 'spark': color = `rgba(255,220,100,${alpha})`; break;
+      case 'soul': color = `rgba(0,255,200,${alpha})`; break;
+      case 'energy': color = `rgba(80,180,255,${alpha})`; break;
+    }
+
+    if (this.type === 'soul' || this.type === 'spark') {
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 12;
+    }
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size * this.life, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+}
+
+// --- SONIC RING ---
+class SonicRing {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.radius = 0;
+    this.maxRadius = Math.max(W, H) * 0.8;
+    this.speed = 4 + Math.random() * 3;
+    this.life = 1;
+    this.hue = 170 + Math.random() * 40;
+  }
+
+  update() {
+    this.radius += this.speed;
+    this.life = 1 - this.radius / this.maxRadius;
+    return this.life > 0;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = `hsla(${this.hue},80%,60%,${this.life * 0.5})`;
+    ctx.lineWidth = 2 + this.life * 3;
+    ctx.shadowColor = `hsla(${this.hue},80%,60%,${this.life * 0.3})`;
+    ctx.shadowBlur = 20;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+}
+
+// --- BUTTERFLY (PSYCHE) ---
+class Butterfly {
+  constructor() {
+    this.x = cx + (Math.random() - 0.5) * 100;
+    this.y = cy - 60;
+    this.wingPhase = Math.random() * Math.PI * 2;
+    this.wingSpeed = 0.08 + Math.random() * 0.04;
+    this.size = 15 + Math.random() * 20;
+    this.hue = 280 + Math.random() * 60;
+    this.drift = Math.random() * 0.3;
+    this.opacity = 0;
+    this.targetY = cy - 100 - Math.random() * 200;
+  }
+
+  update() {
+    this.wingPhase += this.wingSpeed;
+    this.opacity = Math.min(1, this.opacity + 0.01);
+    this.y += (this.targetY - this.y) * 0.003;
+    this.x += Math.sin(globalTime * 0.001 + this.drift * 10) * 0.5;
+  }
+
+  draw() {
+    const wingAngle = Math.sin(this.wingPhase) * 0.7;
+    const s = this.size;
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.globalAlpha = this.opacity;
+
+    // Left wing
+    ctx.save();
+    ctx.scale(Math.cos(wingAngle), 1);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(-s * 0.8, -s * 0.5, -s, -s * 0.2, -s * 0.3, s * 0.3);
+    ctx.closePath();
+    const gL = ctx.createRadialGradient(0, 0, 0, 0, 0, s);
+    gL.addColorStop(0, `hsla(${this.hue},90%,70%,0.8)`);
+    gL.addColorStop(1, `hsla(${this.hue + 40},80%,40%,0.3)`);
+    ctx.fillStyle = gL;
+    ctx.shadowColor = `hsla(${this.hue},90%,60%,0.5)`;
+    ctx.shadowBlur = 15;
+    ctx.fill();
+    ctx.restore();
+
+    // Right wing
+    ctx.save();
+    ctx.scale(Math.cos(-wingAngle), 1);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(s * 0.8, -s * 0.5, s, -s * 0.2, s * 0.3, s * 0.3);
+    ctx.closePath();
+    ctx.fillStyle = gL;
+    ctx.fill();
+    ctx.restore();
+
+    // Body
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 1.5, s * 0.25, 0, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${this.hue},60%,30%,${this.opacity})`;
+    ctx.fill();
+
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+}
+
+// --- INIT ---
+function init() {
+  bones = [];
+  for (let i = 0; i < 40; i++) bones.push(new Bone());
+  particles = [];
+  sonicRings = [];
+  butterflies = [];
+}
+
+// --- GROUND CRACK EFFECT ---
+function drawGround(crackProgress) {
+  const groundY = cy + H * 0.18;
+  // Cracked earth line
+  ctx.beginPath();
+  ctx.moveTo(cx - W * 0.3, groundY);
+  for (let x = cx - W * 0.3; x < cx + W * 0.3; x += 8) {
+    ctx.lineTo(x, groundY + (Math.random() - 0.5) * 4 * crackProgress);
+  }
+  ctx.strokeStyle = `rgba(120,100,70,${0.3 + crackProgress * 0.3})`;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Crack lines
+  if (crackProgress > 0.2) {
+    for (let i = 0; i < 5; i++) {
+      const sx = cx + (i - 2) * 60 + Math.random() * 20;
+      ctx.beginPath();
+      ctx.moveTo(sx, groundY);
+      let cy2 = groundY;
+      for (let j = 0; j < 4; j++) {
+        cy2 += 10 + Math.random() * 15;
+        ctx.lineTo(sx + (Math.random() - 0.5) * 20, cy2);
+      }
+      ctx.strokeStyle = `rgba(80,60,40,${crackProgress * 0.4})`;
+      ctx.lineWidth = 1 + Math.random();
+      ctx.stroke();
+    }
+  }
+
+  // Amber glow from cracks
+  if (crackProgress > 0.5) {
+    const glow = ctx.createRadialGradient(cx, groundY, 0, cx, groundY, 200);
+    glow.addColorStop(0, `rgba(255,180,50,${(crackProgress - 0.5) * 0.15})`);
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(cx - 200, groundY - 100, 400, 200);
+  }
+}
+
+// --- MAIN RENDER ---
+function render(timestamp) {
+  if (!started) { animFrame = requestAnimationFrame(render); return; }
+
+  globalTime = timestamp;
+  ctx.clearRect(0, 0, W, H);
+
+  // Background gradient shifts per phase
+  let bgGrad;
+  if (phase <= 1) {
+    bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, '#050505');
+    bgGrad.addColorStop(1, '#0a0806');
+  } else if (phase === 2) {
+    bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, '#080510');
+    bgGrad.addColorStop(1, '#0a0806');
+  } else if (phase === 3) {
+    bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, '#0a0815');
+    bgGrad.addColorStop(1, '#100a06');
+  } else if (phase === 4) {
+    bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, '#0a1020');
+    bgGrad.addColorStop(1, '#0a0806');
+  } else {
+    const t = Math.min(1, phaseTime / 3000);
+    const r = Math.floor(10 + t * 20);
+    const g = Math.floor(8 + t * 15);
+    const b = Math.floor(6 + t * 10);
+    bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, `rgb(${r + 15},${g + 10},${b + 25})`);
+    bgGrad.addColorStop(0.5, `rgb(${r + 30},${g + 15},${b})`);
+    bgGrad.addColorStop(1, `rgb(${r},${g},${b})`);
+  }
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Phase-specific logic
+  const phaseDur = PHASES[phase]?.duration || 4000;
+  const progress = Math.min(1, phaseTime / phaseDur);
+
+  // Phase 1: Dry Bones — bones rise from ground
+  if (phase >= 1) {
+    const boneProgress = phase === 1 ? progress : 1;
+    drawGround(boneProgress);
+    bones.forEach(b => { b.update(boneProgress); b.draw(); });
+
+    // Dust particles during bone assembly
+    if (phase === 1 && Math.random() < 0.3) {
+      const b = bones[Math.floor(Math.random() * bones.length)];
+      particles.push(new Particle(b.x + (Math.random() - 0.5) * 20, b.y, 'dust'));
+    }
+  }
+
+  // Phase 2: Wake Me Up Inside — sparks ignite
+  if (phase >= 2) {
+    if (phase === 2 && Math.random() < 0.2 + progress * 0.5) {
+      particles.push(new Particle(
+        cx + (Math.random() - 0.5) * 100,
+        cy + (Math.random() - 0.5) * 200 - 30,
+        'spark'
+      ));
+    }
+    // Chest glow
+    const glowIntensity = phase === 2 ? progress : 1;
+    const chestGlow = ctx.createRadialGradient(cx, cy - 20, 0, cx, cy - 20, 100 * glowIntensity);
+    chestGlow.addColorStop(0, `rgba(255,200,80,${glowIntensity * 0.2})`);
+    chestGlow.addColorStop(0.5, `rgba(255,150,50,${glowIntensity * 0.08})`);
+    chestGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = chestGlow;
+    ctx.fillRect(cx - 150, cy - 170, 300, 300);
+  }
+
+  // Phase 3: Give Life — soul particles rise
+  if (phase >= 3) {
+    if (phase === 3 && Math.random() < 0.4) {
+      particles.push(new Particle(
+        cx + (Math.random() - 0.5) * 60,
+        cy + 50 - Math.random() * 100,
+        'soul'
+      ));
+    }
+  }
+
+  // Phase 4: Sonic Calling — concentric rings pulse outward
+  if (phase >= 4) {
+    if (phase === 4 && phaseTime % 300 < 16) {
+      sonicRings.push(new SonicRing(cx, cy - 20));
+    }
+    // Energy particles
+    if (Math.random() < 0.3) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 30 + Math.random() * 50;
+      const p = new Particle(
+        cx + Math.cos(angle) * dist,
+        cy - 20 + Math.sin(angle) * dist,
+        'energy'
+      );
+      p.vx = Math.cos(angle) * 2;
+      p.vy = Math.sin(angle) * 2;
+      particles.push(p);
+    }
+  }
+
+  // Phase 5: Waking Psyche — butterflies emerge
+  if (phase >= 5) {
+    if (butterflies.length < 8 && phaseTime % 600 < 16) {
+      butterflies.push(new Butterfly());
+    }
+    butterflies.forEach(b => { b.update(); b.draw(); });
+
+    // Full body glow
+    const auraGlow = ctx.createRadialGradient(cx, cy - 40, 0, cx, cy - 40, 250);
+    auraGlow.addColorStop(0, `rgba(200,150,255,${Math.sin(globalTime * 0.002) * 0.05 + 0.08})`);
+    auraGlow.addColorStop(0.5, `rgba(100,200,255,0.03)`);
+    auraGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = auraGlow;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Update & draw particles
+  sonicRings = sonicRings.filter(r => { const alive = r.update(); r.draw(); return alive; });
+  particles = particles.filter(p => { const alive = p.update(); p.draw(); return alive; });
+
+  // Phase timer
+  phaseTime += 16;
+  if (phase > 0 && phase < PHASES.length - 1 && phaseTime >= phaseDur) {
+    phase++;
+    phaseTime = 0;
+    updatePhaseText();
+  }
+
+  // Loop phase 5
+  if (phase === PHASES.length - 1 && phaseTime > PHASES[phase].duration) {
+    phaseTime = PHASES[phase].duration; // hold
+  }
+
+  animFrame = requestAnimationFrame(render);
+}
+
+function updatePhaseText() {
+  const el = document.getElementById('phaseText');
+  el.classList.remove('visible');
+  setTimeout(() => {
+    el.textContent = PHASES[phase]?.name || '';
+    el.classList.add('visible');
+  }, 200);
+}
+
+function beginSequence() {
+  document.getElementById('btnStart').classList.add('hidden');
+  init();
+  started = true;
+  phase = 1;
+  phaseTime = 0;
+  updatePhaseText();
+
+  // Show title at phase 3
+  setTimeout(() => {
+    document.getElementById('title').classList.add('visible');
+    document.getElementById('subtitle').classList.add('visible');
+  }, 8500);
+}
+
+// Start render loop
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

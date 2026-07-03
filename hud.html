@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PSK Link Sanitizer — HUD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-panel: #0d1117;
+      --green: #00ff41;
+      --green-dim: #00cc33;
+      --amber: #ffaa00;
+      --red: #ff3333;
+      --blue: #00aaff;
+      --text: #b0b0b0;
+      --border: #1a3a1a;
+      --glow-green: 0 0 8px rgba(0,255,65,0.3), 0 0 20px rgba(0,255,65,0.1);
+      --glow-amber: 0 0 8px rgba(255,170,0,0.3);
+      --glow-red: 0 0 8px rgba(255,51,51,0.3);
+      --font: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scanline overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* ASCII Header */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 20px 0;
+    }
+
+    .ascii-art {
+      color: var(--green);
+      text-shadow: var(--glow-green);
+      font-size: 10px;
+      line-height: 1.2;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 600px) {
+      .ascii-art { font-size: 6px; }
+    }
+
+    .subtitle {
+      color: var(--green-dim);
+      font-size: 12px;
+      margin-top: 8px;
+      text-shadow: var(--glow-green);
+      letter-spacing: 2px;
+    }
+
+    .version {
+      color: #446644;
+      font-size: 10px;
+      margin-top: 4px;
+    }
+
+    /* Input Area */
+    .input-section {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .input-label {
+      color: var(--green-dim);
+      font-size: 11px;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .prompt-prefix {
+      color: var(--green);
+      font-size: 14px;
+      padding-top: 8px;
+      text-shadow: var(--glow-green);
+      user-select: none;
+    }
+
+    .url-input {
+      flex: 1;
+      background: #050505;
+      border: 1px solid #222;
+      color: var(--green);
+      font-family: var(--font);
+      font-size: 12px;
+      padding: 10px 12px;
+      border-radius: 2px;
+      resize: vertical;
+      min-height: 100px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .url-input:focus {
+      border-color: var(--green-dim);
+      box-shadow: 0 0 12px rgba(0,255,65,0.1);
+    }
+
+    .url-input::placeholder {
+      color: #2a4a2a;
+    }
+
+    .btn-sanitize {
+      background: transparent;
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-family: var(--font);
+      font-size: 12px;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 2px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: all 0.3s;
+      white-space: nowrap;
+      text-shadow: var(--glow-green);
+    }
+
+    .btn-sanitize:hover {
+      background: rgba(0,255,65,0.1);
+      box-shadow: 0 0 16px rgba(0,255,65,0.2);
+    }
+
+    .btn-sanitize:active {
+      background: rgba(0,255,65,0.2);
+    }
+
+    /* Log Output */
+    .log-section {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      animation: border-pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes border-pulse {
+      0%, 100% { border-color: var(--border); box-shadow: none; }
+      50% { border-color: #1a4a1a; box-shadow: 0 0 12px rgba(0,255,65,0.05); }
+    }
+
+    .log-header {
+      background: #0a0f0a;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .log-title {
+      color: var(--green-dim);
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .log-clear {
+      background: none;
+      border: 1px solid #333;
+      color: #555;
+      font-family: var(--font);
+      font-size: 10px;
+      padding: 2px 8px;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .log-clear:hover { color: var(--red); border-color: var(--red); }
+
+    .log-output {
+      padding: 12px 16px;
+      max-height: 300px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    .log-output::-webkit-scrollbar { width: 6px; }
+    .log-output::-webkit-scrollbar-track { background: #111; }
+    .log-output::-webkit-scrollbar-thumb { background: #2a4a2a; border-radius: 3px; }
+
+    .log-line {
+      opacity: 0;
+      animation: logFadeIn 0.3s ease forwards;
+      padding: 2px 0;
+      word-break: break-all;
+    }
+
+    .log-line.green { color: var(--green); text-shadow: var(--glow-green); }
+    .log-line.amber { color: var(--amber); text-shadow: var(--glow-amber); }
+    .log-line.red { color: var(--red); text-shadow: var(--glow-red); }
+    .log-line.blue { color: var(--blue); }
+    .log-line.dim { color: #555; }
+
+    @keyframes logFadeIn {
+      from { opacity: 0; transform: translateX(-8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .cursor-blink {
+      display: inline-block;
+      width: 8px;
+      height: 14px;
+      background: var(--green);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Results Panel */
+    .results-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .result-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .result-card.blocked { border-color: #4a1a1a; }
+    .result-card.clean { border-color: #1a4a1a; }
+
+    .result-header {
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: #0a0f0a;
+    }
+
+    .result-header.blocked { background: #1a0505; }
+
+    .result-status {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .result-status.pass { color: var(--green); text-shadow: var(--glow-green); }
+    .result-status.block { color: var(--red); text-shadow: var(--glow-red); }
+
+    .result-body { padding: 12px 16px; }
+
+    .result-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .result-label {
+      color: #666;
+      min-width: 100px;
+      font-size: 11px;
+    }
+
+    .result-value {
+      color: var(--text);
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    .result-value.green { color: var(--green); }
+    .result-value.amber { color: var(--amber); }
+    .result-value.red { color: var(--red); text-decoration: line-through; }
+
+    .btn-copy {
+      background: none;
+      border: 1px solid #333;
+      color: #666;
+      font-family: var(--font);
+      font-size: 10px;
+      padding: 2px 8px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover { color: var(--green); border-color: var(--green); }
+    .btn-copy.copied { color: var(--amber); border-color: var(--amber); }
+
+    .json-toggle {
+      background: none;
+      border: 1px solid #333;
+      color: var(--blue);
+      font-family: var(--font);
+      font-size: 10px;
+      padding: 4px 12px;
+      cursor: pointer;
+      border-radius: 2px;
+      margin-top: 8px;
+    }
+
+    .json-toggle:hover { border-color: var(--blue); }
+
+    .json-block {
+      background: #050505;
+      border: 1px solid #1a1a1a;
+      padding: 12px;
+      margin-top: 8px;
+      border-radius: 2px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      font-size: 11px;
+      color: var(--blue);
+    }
+
+    .json-block.visible { display: block; }
+
+    .stripped-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .stripped-tag {
+      background: rgba(255,170,0,0.1);
+      border: 1px solid rgba(255,170,0,0.3);
+      color: var(--amber);
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 2px;
+    }
+
+    .empty-state {
+      color: #333;
+      text-align: center;
+      padding: 40px 0;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <pre class="ascii-art">
+ ____   ___   ___  ____    ____ _____ ___ ____ _  __
+|  _ \ / _ \ / _ \|  _ \  / ___|_   _|_ _/ ___| |/ /
+| |_) | | | | | | | |_) | \___ \ | |  | | |   | ' / 
+|  __/| |_| | |_| |  __/   ___) || |  | | |___| . \ 
+|_|    \___/ \___/|_|      |____/ |_| |___\____|_|\_\
+      </pre>
+      <div class="subtitle">KINGDOM LINK SANITIZER — DEFENSE MODULE ACTIVE</div>
+      <div class="version">v1.0 • Layers: Sinkhole → Strip → Tag → Meta</div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-section">
+      <div class="input-label">▶ PASTE URLs (ONE PER LINE)</div>
+      <div class="input-row">
+        <span class="prompt-prefix">›</span>
+        <textarea class="url-input" id="urlInput" placeholder="https://example.com/product?utm_source=tracking&fbclid=abc123..."
+          spellcheck="false">https://urbanbrim.com/products/brielle-soft-touch-blouse?utm_source=mediago&utm_medium=referral&utm_campaign=test&tracking_id=abc123&cc4d76fdaf5=5651&Q09ORklH=2
+https://gieset.org/click?key=1a22c5f9&e=d928rgejn1oc&s1=195610&s2=www.independent.co.uk
+https://x.com/ElaraxE/status/2072167048470548524?s=20
+https://youtube.com/shorts/0sr44mIFdeA?si=VbSIZowhBIlNmY4j
+https://www.facebook.com/checkpoint/1501092823525282/?next=https%3A%2F%2Fwww.facebook.com%2Fdialog%2Fshare</textarea>
+        <button class="btn-sanitize" id="btnSanitize" onclick="runPipeline()">SANITIZE</button>
+      </div>
+    </div>
+
+    <!-- Log Output -->
+    <div class="log-section">
+      <div class="log-header">
+        <span class="log-title">▣ TERMINAL LOG</span>
+        <button class="log-clear" onclick="clearLog()">CLEAR</button>
+      </div>
+      <div class="log-output" id="logOutput"></div>
+    </div>
+
+    <!-- Results -->
+    <div class="results-section" id="results">
+      <div class="empty-state" id="emptyState">System ready. Paste URLs and hit SANITIZE.</div>
+    </div>
+  </div>
+
+<script>
+// =============================================================================
+// POOP STICK KINGDOM LINK SANITIZER — STANDALONE HUD ENGINE
+// =============================================================================
+
+// --- CONFIG ---
+const SINKHOLE_DOMAINS = ['gieset.org','go.mediagotechnology.com','equvaxiw.sbs','omokeh.org','prf.hn','bit.ly','tinyurl.com','ow.ly','rb.gy','shorturl.at','cutt.ly','is.gd','v.gd','shorte.st','adf.ly'];
+
+const PHISHING_PATHS = [
+  /\/checkpoint\//i, /\/confirm\//i, /\/verify\//i,
+  /\/login\//i, /\/auth\//i, /\/secure\//i, /\/account\/recover/i
+];
+
+const TRACKING_REGEX = /^(utm_\w+|fbclid|gclid|dclid|msclkid|twclid|ttclid|clickid|IRID|_ga|_gl|mc_[ce]id|yclid|_openstat|ref|referrer|tracking_id|gad_\w+|wbraid|gbraid|singular_click_id|sl_id|pcn|_fallback_redirect|android_dl|deeplink|adjust_\w+|branch_\w+|af_\w+|mfadid|adid|admclid|partner|veh|camref|creativeref|pubref|ir_\w+|irgwc|afsrc|sharedid|sid|cc4d76fdaf5|a0v5la7bquf89|uy3ubftvh0u6o8|cusduxj27i|xnfrr0ncac|zsmoi87pih9|lzzgnpz8d|Q09ORklH|igshid|share_id|share_source|share_app_id)$/i;
+
+const DOMAIN_PARAMS = {
+  'x.com':['s'],'twitter.com':['s'],
+  'youtube.com':['si','feature'],'youtu.be':['si','feature'],
+  'facebook.com':['app_id','display','next'],
+  'tiktok.com':['enter_method','enter_from','source','sender_device','is_from_webapp','share_item_id','share_app_id'],
+  'amazon.com':['aref','tag','linkCode','linkId','ref_','pd_rd_i','pd_rd_r','pd_rd_w','pd_rd_wg','pf_rd_i','pf_rd_m','pf_rd_p','pf_rd_r','pf_rd_s','pf_rd_t','cv_ct_cx','content-id','dib','dib_tag','sprefix','crid','aaxitk'],
+  'walmart.com':['wmlspartner','wl0','wl1','wl2','wl3','wl4','wl5','wl6','wl7','wl8','wl9','wl10','wl11','wl12','wl13'],
+  'accuweather.com':['partner'],
+  'google.com':['client','fbs','aep','ntc','mstk','aioh','csuir','mtid','ei','ved','uact','gs_l','gs_lcrp','sclient','sourceid','oq','sca_esv','sxsrf','udm'],
+};
+
+const SAFE_PARAMS = ['v','id','variant','size','color','q','p','page','sort','list','t','start','end'];
+
+const PLATFORM_TAGS = {
+  'x.com':'anigravity_dark_x','twitter.com':'anigravity_dark_x',
+  'youtube.com':'anigravity_dark_yt','youtu.be':'anigravity_dark_yt',
+  'pinterest.com':'anigravity_dark_pin','facebook.com':'anigravity_dark_fb',
+  'instagram.com':'anigravity_dark_ig','tiktok.com':'anigravity_dark_tt',
+  'twitch.tv':'anigravity_dark_twitch'
+};
+
+// --- HELPERS ---
+function ts() { return new Date().toTimeString().slice(0,8); }
+
+function baseDomain(h) {
+  const p = h.replace(/\.$/,'').split('.');
+  return p.length <= 2 ? h : p.slice(-2).join('.');
+}
+
+function getTag(hostname) {
+  const h = hostname.replace(/^www\./,'');
+  return PLATFORM_TAGS[h] || PLATFORM_TAGS[baseDomain(h)] || 'anigravity_dark_grok';
+}
+
+// --- LAYER 1: SINKHOLE ---
+function layer1(url) {
+  let parsed;
+  try { parsed = new URL(url); } catch {
+    return { blocked:true, reason:'invalid_url', domain:'unknown', log:`[${ts()}] DEFENSE: unknown BLOCKED — invalid URL` };
+  }
+  const h = parsed.hostname.toLowerCase();
+  const bd = baseDomain(h);
+
+  if (SINKHOLE_DOMAINS.some(d => h === d || h.endsWith('.'+d))) {
+    return { blocked:true, reason:'sinkhole_domain', domain:h, log:`[${ts()}] DEFENSE: ${h} SINKHOLED — redirect/tracking domain blocked` };
+  }
+
+  if (PHISHING_PATHS.some(p => p.test(parsed.pathname))) {
+    return { blocked:true, reason:'phishing_path', domain:h, log:`[${ts()}] DEFENSE: ${h} PHISHING_BLOCKED — suspicious path: ${parsed.pathname.slice(0,40)}` };
+  }
+
+  return { blocked:false, reason:'clean', domain:h, log:`[${ts()}] DEFENSE: ${h} PASSED — domain cleared` };
+}
+
+// --- LAYER 2: PARAM STRIP ---
+function layer2(url) {
+  let parsed;
+  try { parsed = new URL(url); } catch {
+    return { cleanUrl:url, stripped:[], preserved:[], log:`[${ts()}] DEFENSE: STRIP_FAILED — invalid URL` };
+  }
+  const h = parsed.hostname.toLowerCase();
+  const bd = baseDomain(h);
+  const all = [...parsed.searchParams.entries()];
+  const stripped = [], preserved = [];
+  parsed.search = '';
+
+  for (const [k,v] of all) {
+    const isTracking = TRACKING_REGEX.test(k);
+    const isDomainSpecific = (DOMAIN_PARAMS[bd]||[]).includes(k);
+    const isSafe = SAFE_PARAMS.includes(k.toLowerCase());
+
+    if (!isSafe && (isTracking || isDomainSpecific)) {
+      stripped.push({name:k, value:v});
+    } else {
+      preserved.push({name:k, value:v});
+      parsed.searchParams.set(k, v);
+    }
+  }
+
+  let clean = parsed.toString();
+  if (clean.endsWith('?')) clean = clean.slice(0,-1);
+
+  const names = stripped.map(p=>p.name).join(', ');
+  const detail = stripped.length ? `${stripped.length} params stripped: ${names}` : 'no tracking params found';
+
+  return { cleanUrl:clean, stripped, preserved, log:`[${ts()}] DEFENSE: ${h} SANITIZED — ${detail}` };
+}
+
+// --- LAYER 3: TAG ---
+function layer3(cleanUrl) {
+  let parsed;
+  try { parsed = new URL(cleanUrl); } catch {
+    return { taggedUrl:cleanUrl, tag:'', log:`[${ts()}] ANIGRAVITY: TAG_FAILED` };
+  }
+  const h = parsed.hostname.toLowerCase().replace(/^www\./,'');
+  const tag = getTag(h);
+  parsed.searchParams.set('utm_content', tag);
+  return { taggedUrl:parsed.toString(), tag, log:`[${ts()}] ANIGRAVITY: Tagged → utm_content=${tag}` };
+}
+
+// --- LAYER 4: META SCAFFOLD ---
+function layer4(taggedUrl, domain) {
+  const payload = {
+    catalog_item: {
+      link: taggedUrl,
+      availability: 'in stock',
+      condition: 'new'
+    },
+    campaign: {
+      objective: 'OUTCOME_SALES',
+      budget_optimization: { cbo: true, daily_budget: '$100' },
+      placements: 'advantage_plus',
+      attribution: '7d_click_1d_view',
+      rules: [{ name:'CPA Pause Guard', pause_if_cpa_exceeds:'€15' }]
+    }
+  };
+  return { payload, log:`[${ts()}] META: Payload built — CBO $100/day, Advantage+ armed` };
+}
+
+// --- PIPELINE ---
+function sanitize(url) {
+  const logs = [];
+  const l1 = layer1(url);
+  logs.push(l1.log);
+
+  if (l1.blocked) {
+    return { input:url, blocked:true, reason:l1.reason, domain:l1.domain, logs, cleanUrl:null, taggedUrl:null, stripped:[], meta:null };
+  }
+
+  const l2 = layer2(url);
+  logs.push(l2.log);
+
+  const l3 = layer3(l2.cleanUrl);
+  logs.push(l3.log);
+
+  const l4 = layer4(l3.taggedUrl, l1.domain);
+  logs.push(l4.log);
+
+  return { input:url, blocked:false, domain:l1.domain, logs, cleanUrl:l2.cleanUrl, taggedUrl:l3.taggedUrl, tag:l3.tag, stripped:l2.stripped, preserved:l2.preserved, meta:l4.payload };
+}
+
+// =============================================================================
+// UI LOGIC
+// =============================================================================
+
+const logEl = document.getElementById('logOutput');
+const resultsEl = document.getElementById('results');
+const emptyEl = document.getElementById('emptyState');
+const inputEl = document.getElementById('urlInput');
+
+let logLineDelay = 0;
+
+function addLog(text, cls='dim') {
+  const line = document.createElement('div');
+  line.className = `log-line ${cls}`;
+  line.textContent = text;
+  line.style.animationDelay = `${logLineDelay}ms`;
+  logLineDelay += 80;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function clearLog() {
+  logEl.innerHTML = '';
+  resultsEl.innerHTML = '';
+  emptyEl && (emptyEl.style.display = 'block');
+}
+
+function copyToClipboard(text, btnEl) {
+  navigator.clipboard.writeText(text).then(() => {
+    btnEl.textContent = 'COPIED';
+    btnEl.classList.add('copied');
+    setTimeout(() => { btnEl.textContent = 'COPY'; btnEl.classList.remove('copied'); }, 1500);
+  });
+}
+
+function renderResult(result) {
+  const card = document.createElement('div');
+  card.className = `result-card ${result.blocked ? 'blocked' : 'clean'}`;
+
+  if (result.blocked) {
+    card.innerHTML = `
+      <div class="result-header blocked">
+        <span class="result-status block">❌ BLOCKED — ${result.reason.replace(/_/g,' ').toUpperCase()}</span>
+      </div>
+      <div class="result-body">
+        <div class="result-row">
+          <span class="result-label">Input:</span>
+          <span class="result-value red">${escHtml(result.input)}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Domain:</span>
+          <span class="result-value red">${escHtml(result.domain)}</span>
+        </div>
+      </div>`;
+  } else {
+    const strippedHtml = result.stripped.length
+      ? `<div class="stripped-list">${result.stripped.map(p=>`<span class="stripped-tag">${escHtml(p.name)}=${escHtml(p.value.slice(0,20))}</span>`).join('')}</div>`
+      : '<span style="color:#555">none</span>';
+
+    const metaId = 'meta-' + Math.random().toString(36).slice(2,8);
+    const metaJson = JSON.stringify(result.meta, null, 2);
+
+    card.innerHTML = `
+      <div class="result-header">
+        <span class="result-status pass">✅ CLEAN — ${escHtml(result.domain)}</span>
+        <button class="btn-copy" onclick="copyToClipboard('${escAttr(result.taggedUrl)}', this)">COPY URL</button>
+      </div>
+      <div class="result-body">
+        <div class="result-row">
+          <span class="result-label">Input:</span>
+          <span class="result-value">${escHtml(result.input.slice(0,100))}${result.input.length > 100 ? '…' : ''}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Clean URL:</span>
+          <span class="result-value green">${escHtml(result.cleanUrl)}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Tagged URL:</span>
+          <span class="result-value green">${escHtml(result.taggedUrl)}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Tag:</span>
+          <span class="result-value amber">${escHtml(result.tag)}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Stripped (${result.stripped.length}):</span>
+          <div class="result-value">${strippedHtml}</div>
+        </div>
+        <button class="json-toggle" onclick="document.getElementById('${metaId}').classList.toggle('visible')">▾ META API PAYLOAD</button>
+        <pre class="json-block" id="${metaId}">${escHtml(metaJson)}</pre>
+      </div>`;
+  }
+
+  resultsEl.appendChild(card);
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s) { return String(s).replace(/'/g,"\\'").replace(/\\/g,'\\\\'); }
+
+function runPipeline() {
+  const raw = inputEl.value.trim();
+  if (!raw) return;
+
+  const urls = raw.split('\n').map(u => u.trim()).filter(u => u.length > 0);
+  if (urls.length === 0) return;
+
+  // Reset
+  logLineDelay = 0;
+  logEl.innerHTML = '';
+  resultsEl.innerHTML = '';
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  addLog(`[${ts()}] PIPELINE: Processing ${urls.length} URL${urls.length > 1 ? 's' : ''}...`, 'blue');
+  addLog('', 'dim');
+
+  for (const url of urls) {
+    const result = sanitize(url);
+    for (const log of result.logs) {
+      const cls = log.includes('SINKHOLED') || log.includes('PHISHING') || log.includes('BLOCKED') ? 'red'
+                : log.includes('SANITIZED') || log.includes('stripped') ? 'amber'
+                : log.includes('PASSED') || log.includes('Tagged') ? 'green'
+                : log.includes('META:') ? 'blue'
+                : 'dim';
+      addLog(log, cls);
+    }
+    addLog('', 'dim');
+    renderResult(result);
+  }
+
+  addLog(`[${ts()}] PIPELINE: Complete — ${urls.length} URLs processed`, 'green');
+
+  // Add blinking cursor
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor-blink';
+  logEl.appendChild(cursor);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+// Keyboard shortcut: Ctrl+Enter or just Enter when input focused
+inputEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    runPipeline();
+  }
+});
+
+// --- BOOT SEQUENCE ---
+window.addEventListener('DOMContentLoaded', () => {
+  const bootLines = [
+    { text: `[${ts()}] BOOT: Poop Stick Kingdom Defense Module v1.0`, cls: 'green' },
+    { text: `[${ts()}] BOOT: Loading sinkhole database... ${SINKHOLE_DOMAINS.length} domains blocked`, cls: 'green' },
+    { text: `[${ts()}] BOOT: Param regex engine armed... 30+ patterns active`, cls: 'green' },
+    { text: `[${ts()}] BOOT: Phishing path detector loaded... ${PHISHING_PATHS.length} patterns`, cls: 'amber' },
+    { text: `[${ts()}] BOOT: System ready. Paste URLs and hit SANITIZE.`, cls: 'blue' },
+  ];
+
+  logLineDelay = 0;
+  bootLines.forEach((line, i) => {
+    setTimeout(() => addLog(line.text, line.cls), i * 400);
+  });
+
+  setTimeout(() => {
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor-blink';
+    logEl.appendChild(cursor);
+  }, bootLines.length * 400 + 200);
+});
+</script>
+</body>
+</html>
