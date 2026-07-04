@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harmona Graph — Frequency Paints the Curve</title>
+<meta name="description" content="Interactive harmonograph visualization. Lissajous curves from musical frequency ratios. Math becomes beauty.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --lcars-gold: #f1df6f;
+  --lcars-orange: #ff9944;
+  --lcars-blue: #9999ff;
+  --lcars-lavender: #cc99cc;
+  --lcars-peach: #ffcc99;
+  --lcars-tan: #cc6633;
+  --lcars-red: #cc6666;
+  --lcars-salmon: #ff9966;
+  --lcars-bg: #0a0a12;
+  --lcars-panel: #111122;
+  --glow: 0 0 20px rgba(241, 223, 111, 0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--lcars-bg);
+  color: var(--lcars-orange);
+  font-family: 'Share Tech Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── LCARS Frame ─────────────────── */
+
+.lcars-frame {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  grid-template-rows: 60px 1fr 48px;
+  min-height: 100vh;
+  gap: 3px;
+}
+
+.lcars-top-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: stretch;
+}
+
+.lcars-elbow-tl {
+  width: 80px;
+  min-width: 80px;
+  background: var(--lcars-gold);
+  border-radius: 0 0 0 40px;
+}
+
+.lcars-title-bar {
+  flex: 1;
+  background: var(--lcars-gold);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 30px 100%);
+}
+
+.lcars-title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--lcars-bg);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.lcars-subtitle {
+  font-size: 11px;
+  color: var(--lcars-bg);
+  opacity: 0.7;
+}
+
+.lcars-sidebar {
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lcars-pill {
+  background: var(--lcars-blue);
+  border-radius: 0 20px 20px 0;
+  width: 100%;
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.lcars-pill:hover {
+  filter: brightness(1.3);
+  box-shadow: var(--glow);
+}
+
+.lcars-pill.active {
+  background: var(--lcars-gold);
+}
+
+.lcars-pill-label {
+  position: absolute;
+  left: 88px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--lcars-peach);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.lcars-pill:hover .lcars-pill-label {
+  opacity: 1;
+}
+
+.lcars-pill:nth-child(2) { background: var(--lcars-lavender); }
+.lcars-pill:nth-child(3) { background: var(--lcars-peach); }
+.lcars-pill:nth-child(4) { background: var(--lcars-orange); }
+.lcars-pill:nth-child(5) { background: var(--lcars-salmon); }
+.lcars-pill:nth-child(6) { background: var(--lcars-tan); }
+.lcars-pill:nth-child(7) { background: var(--lcars-red); }
+.lcars-pill:nth-child(8) { background: var(--lcars-blue); }
+.lcars-pill:nth-child(9) { background: var(--lcars-lavender); }
+.lcars-pill:nth-child(10) { background: var(--lcars-gold); }
+
+.sidebar-spacer {
+  flex: 1;
+  background: var(--lcars-blue);
+  border-radius: 0 0 20px 0;
+  opacity: 0.3;
+}
+
+/* ─── Main Content ────────────────── */
+
+.main-content {
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 16px;
+  padding: 16px;
+}
+
+/* ─── Canvas Area ─────────────────── */
+
+.canvas-container {
+  position: relative;
+  background: var(--lcars-panel);
+  border-radius: 12px;
+  border: 1px solid rgba(241, 223, 111, 0.1);
+  overflow: hidden;
+  aspect-ratio: 1;
+  max-height: calc(100vh - 160px);
+  align-self: center;
+  justify-self: center;
+  width: 100%;
+  max-width: calc(100vh - 160px);
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.canvas-label {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  font-size: 11px;
+  color: var(--lcars-peach);
+  opacity: 0.6;
+}
+
+.canvas-ratio {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--lcars-gold);
+  opacity: 0.4;
+  letter-spacing: 2px;
+}
+
+.canvas-name {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  color: var(--lcars-orange);
+  opacity: 0.5;
+}
+
+/* ─── Controls Panel ──────────────── */
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: calc(100vh - 160px);
+  padding-right: 4px;
+}
+
+.control-group {
+  background: var(--lcars-panel);
+  border: 1px solid rgba(241, 223, 111, 0.08);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.control-group h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--lcars-gold);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(241, 223, 111, 0.1);
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.control-row label {
+  font-size: 11px;
+  color: var(--lcars-peach);
+  min-width: 70px;
+}
+
+.control-row input[type="range"] {
+  flex: 1;
+  margin: 0 8px;
+  accent-color: var(--lcars-gold);
+  height: 4px;
+}
+
+.control-row .value {
+  font-size: 11px;
+  color: var(--lcars-gold);
+  min-width: 36px;
+  text-align: right;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* ─── Buttons ─────────────────────── */
+
+.btn-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  background: var(--lcars-blue);
+  border: none;
+  color: var(--lcars-bg);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn:hover {
+  filter: brightness(1.3);
+  box-shadow: 0 0 12px rgba(153, 153, 255, 0.4);
+}
+
+.btn.active {
+  background: var(--lcars-gold);
+}
+
+.btn-draw {
+  background: var(--lcars-gold);
+  font-size: 13px;
+  padding: 10px 20px;
+  width: 100%;
+  letter-spacing: 2px;
+}
+
+.btn-draw:hover {
+  box-shadow: 0 0 20px rgba(241, 223, 111, 0.5);
+}
+
+/* ─── Music Intervals ─────────────── */
+
+.interval-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.interval-btn {
+  background: rgba(153, 153, 255, 0.15);
+  border: 1px solid rgba(153, 153, 255, 0.2);
+  color: var(--lcars-blue);
+  font-size: 10px;
+  padding: 6px 2px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.interval-btn:hover {
+  background: rgba(153, 153, 255, 0.3);
+  border-color: var(--lcars-blue);
+  box-shadow: 0 0 8px rgba(153, 153, 255, 0.3);
+}
+
+.interval-btn.active {
+  background: var(--lcars-gold);
+  border-color: var(--lcars-gold);
+  color: var(--lcars-bg);
+}
+
+.interval-name {
+  font-size: 8px;
+  color: var(--lcars-peach);
+  opacity: 0.6;
+  display: block;
+  margin-top: 2px;
+}
+
+/* ─── Bottom Bar ──────────────────── */
+
+.lcars-bottom-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: stretch;
+}
+
+.lcars-elbow-bl {
+  width: 80px;
+  min-width: 80px;
+  background: var(--lcars-blue);
+  border-radius: 40px 0 0 0;
+}
+
+.lcars-status-bar {
+  flex: 1;
+  background: var(--lcars-blue);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  clip-path: polygon(30px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.status-text {
+  font-size: 11px;
+  color: var(--lcars-bg);
+  font-weight: 700;
+}
+
+/* ─── Animations ──────────────────── */
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.drawing .canvas-ratio {
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+/* ─── Responsive ──────────────────── */
+
+@media (max-width: 900px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  .canvas-container {
+    max-width: 100%;
+  }
+  .lcars-sidebar { display: none; }
+  .lcars-elbow-tl, .lcars-elbow-bl { width: 40px; min-width: 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="lcars-frame">
+  <!-- Top Bar -->
+  <div class="lcars-top-bar">
+    <div class="lcars-elbow-tl"></div>
+    <div class="lcars-title-bar">
+      <span class="lcars-title">Harmona Graph</span>
+      <span class="lcars-subtitle">FREQUENCY PAINTS THE CURVE</span>
+    </div>
+  </div>
+
+  <!-- Sidebar: 10 Elements -->
+  <div class="lcars-sidebar" id="sidebar"></div>
+
+  <!-- Main -->
+  <div class="main-content">
+    <div class="canvas-container" id="canvasWrap">
+      <canvas id="canvas"></canvas>
+      <div class="canvas-name" id="curveName">Fourth</div>
+      <div class="canvas-ratio" id="curveRatio">3:4</div>
+      <div class="canvas-label" id="canvasLabel">ready</div>
+    </div>
+
+    <div class="controls">
+      <!-- Mode Tabs -->
+      <div class="control-group">
+        <h3>Mode</h3>
+        <div class="btn-row">
+          <button class="btn active" onclick="setMode('linear')" id="mLinear">Linear</button>
+          <button class="btn" onclick="setMode('epi')" id="mEpi">Epi</button>
+          <button class="btn" onclick="setMode('rotary')" id="mRotary">Rotary</button>
+        </div>
+      </div>
+
+      <!-- Music Intervals -->
+      <div class="control-group">
+        <h3>♫ Intervals</h3>
+        <div class="interval-grid" id="intervals"></div>
+      </div>
+
+      <!-- Frequency -->
+      <div class="control-group">
+        <h3>Frequency</h3>
+        <div class="control-row">
+          <label>X freq</label>
+          <input type="range" id="freqX" min="1" max="12" step="1" value="3">
+          <span class="value" id="freqXVal">3</span>
+        </div>
+        <div class="control-row">
+          <label>Y freq</label>
+          <input type="range" id="freqY" min="1" max="12" step="1" value="4">
+          <span class="value" id="freqYVal">4</span>
+        </div>
+      </div>
+
+      <!-- Shape -->
+      <div class="control-group">
+        <h3>Shape</h3>
+        <div class="control-row">
+          <label>Phase</label>
+          <input type="range" id="phase" min="0" max="314" step="1" value="0">
+          <span class="value" id="phaseVal">0°</span>
+        </div>
+        <div class="control-row">
+          <label>Wobble</label>
+          <input type="range" id="wobble" min="0" max="100" step="1" value="0">
+          <span class="value" id="wobbleVal">0</span>
+        </div>
+      </div>
+
+      <!-- Decay -->
+      <div class="control-group">
+        <h3>Decay</h3>
+        <div class="control-row">
+          <label>Damp X</label>
+          <input type="range" id="dampX" min="0" max="100" step="1" value="0">
+          <span class="value" id="dampXVal">0</span>
+        </div>
+        <div class="control-row">
+          <label>Damp Y</label>
+          <input type="range" id="dampY" min="0" max="100" step="1" value="0">
+          <span class="value" id="dampYVal">0</span>
+        </div>
+      </div>
+
+      <!-- Visual -->
+      <div class="control-group">
+        <h3>Visual</h3>
+        <div class="control-row">
+          <label>Layers</label>
+          <input type="range" id="layers" min="1" max="8" step="1" value="1">
+          <span class="value" id="layersVal">1</span>
+        </div>
+        <div class="control-row">
+          <label>Speed</label>
+          <input type="range" id="speed" min="1" max="20" step="1" value="8">
+          <span class="value" id="speedVal">8</span>
+        </div>
+      </div>
+
+      <!-- Draw Button -->
+      <button class="btn btn-draw" id="drawBtn" onclick="startDraw()">▶ DRAW</button>
+
+      <!-- Color Mode -->
+      <div class="control-group">
+        <h3>Color</h3>
+        <div class="btn-row">
+          <button class="btn active" onclick="setColorMode('gold')" id="cGold">Gold</button>
+          <button class="btn" onclick="setColorMode('rainbow')" id="cRainbow">Rainbow</button>
+          <button class="btn" onclick="setColorMode('ice')" id="cIce">Ice</button>
+          <button class="btn" onclick="setColorMode('fire')" id="cFire">Fire</button>
+          <button class="btn" onclick="setColorMode('lavender')" id="cLav">Lavender</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="lcars-bottom-bar">
+    <div class="lcars-elbow-bl"></div>
+    <div class="lcars-status-bar">
+      <span class="status-text" id="statusLeft">MINNOW OS — HARMONOGRAPH MODULE</span>
+      <span class="status-text" id="statusRight">POINTS: 0</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Elements (music intervals) ──────────────────────────────
+
+const ELEMENTS = [
+  { name: 'Unison',   fX: 1, fY: 1, music: '1:1' },
+  { name: 'Octave',   fX: 1, fY: 2, music: '1:2' },
+  { name: 'Fifth',    fX: 2, fY: 3, music: '2:3' },
+  { name: 'Fourth',   fX: 3, fY: 4, music: '3:4' },
+  { name: 'Maj 3rd',  fX: 4, fY: 5, music: '4:5' },
+  { name: 'Min 3rd',  fX: 5, fY: 6, music: '5:6' },
+  { name: 'Tritone',  fX: 5, fY: 7, music: '5:7' },
+  { name: 'Sept',     fX: 7, fY: 8, music: '7:8' },
+  { name: 'Ninth',    fX: 8, fY: 9, music: '8:9' },
+  { name: 'Decagon',  fX: 9, fY: 10, music: '9:10' },
+];
+
+// ─── State ────────────────────────────────────────────────────
+
+let colorMode = 'gold';
+let drawMode = 'linear'; // linear | epi | rotary
+let animFrame = null;
+let isDrawing = false;
+let currentElement = 3; // Fourth
+
+// ─── Setup ────────────────────────────────────────────────────
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  const wrap = document.getElementById('canvasWrap');
+  const size = Math.min(wrap.clientWidth, wrap.clientHeight);
+  canvas.width = size * 2;   // 2x for retina
+  canvas.height = size * 2;
+  canvas.style.width = size + 'px';
+  canvas.style.height = size + 'px';
+}
+
+window.addEventListener('resize', resize);
+resize();
+
+// ─── Build Sidebar ────────────────────────────────────────────
+
+const sidebar = document.getElementById('sidebar');
+ELEMENTS.forEach((el, i) => {
+  const pill = document.createElement('div');
+  pill.className = 'lcars-pill' + (i === currentElement ? ' active' : '');
+  pill.id = `pill-${i}`;
+  pill.innerHTML = `<span class="lcars-pill-label">${el.music} ${el.name}</span>`;
+  pill.onclick = () => selectElement(i);
+  sidebar.appendChild(pill);
+});
+
+const spacer = document.createElement('div');
+spacer.className = 'sidebar-spacer';
+sidebar.appendChild(spacer);
+
+// ─── Build Interval Grid ─────────────────────────────────────
+
+const intervalGrid = document.getElementById('intervals');
+ELEMENTS.forEach((el, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'interval-btn' + (i === currentElement ? ' active' : '');
+  btn.id = `int-${i}`;
+  btn.innerHTML = `${el.music}<span class="interval-name">${el.name}</span>`;
+  btn.onclick = () => selectElement(i);
+  intervalGrid.appendChild(btn);
+});
+
+// ─── Element Selection ────────────────────────────────────────
+
+function selectElement(i) {
+  currentElement = i;
+  const el = ELEMENTS[i];
+
+  document.getElementById('freqX').value = el.fX;
+  document.getElementById('freqY').value = el.fY;
+  document.getElementById('freqXVal').textContent = el.fX;
+  document.getElementById('freqYVal').textContent = el.fY;
+
+  document.getElementById('curveName').textContent = el.name;
+  document.getElementById('curveRatio').textContent = el.music;
+
+  // Update active states
+  document.querySelectorAll('.lcars-pill').forEach((p, j) => p.classList.toggle('active', j === i));
+  document.querySelectorAll('.interval-btn').forEach((b, j) => b.classList.toggle('active', j === i));
+
+  startDraw();
+}
+
+// ─── Slider Updates ───────────────────────────────────────────
+
+const sliders = ['freqX', 'freqY', 'phase', 'wobble', 'dampX', 'dampY', 'layers', 'speed'];
+sliders.forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    const val = +el.value;
+    if (id === 'phase') {
+      document.getElementById(id + 'Val').textContent = Math.round(val / 314 * 180) + '°';
+    } else if (id === 'wobble' || id === 'dampX' || id === 'dampY') {
+      document.getElementById(id + 'Val').textContent = (val / 1000).toFixed(3);
+    } else {
+      document.getElementById(id + 'Val').textContent = val;
+    }
+    // Update ratio display
+    if (id === 'freqX' || id === 'freqY') {
+      const fx = +document.getElementById('freqX').value;
+      const fy = +document.getElementById('freqY').value;
+      document.getElementById('curveRatio').textContent = `${fx}:${fy}`;
+    }
+  });
+});
+
+// ─── Color Modes ──────────────────────────────────────────────
+
+function setMode(mode) {
+  drawMode = mode;
+  document.querySelectorAll('#mLinear,#mEpi,#mRotary').forEach(b => b.classList.remove('active'));
+  document.getElementById('m' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+  document.getElementById('canvasLabel').textContent = mode + ' pendulum';
+  startDraw();
+}
+
+function setColorMode(mode) {
+  colorMode = mode;
+  document.querySelectorAll('#cGold,#cRainbow,#cIce,#cFire,#cLav').forEach(b => b.classList.remove('active'));
+  document.getElementById('c' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+  startDraw();
+}
+
+function getColor(t, layer, totalLayers) {
+  const progress = t; // 0..1 along the curve
+
+  switch (colorMode) {
+    case 'gold':
+      return `hsla(45, 85%, ${55 + layer * 5}%, ${0.85 - layer * 0.08})`;
+    case 'rainbow':
+      return `hsla(${progress * 360 + layer * 40}, 80%, 60%, ${0.8 - layer * 0.06})`;
+    case 'ice':
+      return `hsla(${200 + progress * 40 + layer * 15}, 70%, ${55 + layer * 5}%, ${0.85 - layer * 0.08})`;
+    case 'fire':
+      return `hsla(${progress * 60 + layer * 10}, 90%, ${50 + layer * 5}%, ${0.85 - layer * 0.08})`;
+    case 'lavender':
+      return `hsla(${270 + progress * 30 + layer * 20}, 60%, ${60 + layer * 5}%, ${0.8 - layer * 0.07})`;
+    default:
+      return `hsla(45, 85%, 55%, 0.85)`;
+  }
+}
+
+// ─── Drawing ──────────────────────────────────────────────────
+
+function startDraw() {
+  if (animFrame) cancelAnimationFrame(animFrame);
+
+  const w = canvas.width, h = canvas.height;
+  const cx = w / 2, cy = h / 2;
+  const radius = Math.min(w, h) * 0.4;
+
+  const fX = +document.getElementById('freqX').value;
+  const fY = +document.getElementById('freqY').value;
+  const phaseVal = +document.getElementById('phase').value / 100;
+  const wobbleVal = +document.getElementById('wobble').value / 1000;
+  const dampXVal = +document.getElementById('dampX').value / 1000;
+  const dampYVal = +document.getElementById('dampY').value / 1000;
+  const layers = +document.getElementById('layers').value;
+  const speed = +document.getElementById('speed').value;
+
+  const totalPoints = 8000;
+  const duration = Math.PI * 2 * 20;
+  const dt = duration / totalPoints;
+
+  // Pre-compute all layers
+  const allPoints = [];
+  for (let L = 0; L < layers; L++) {
+    const layerW = wobbleVal * (L + 1) * 0.5;
+    const layerPhase = phaseVal + (L / layers) * 0.3;
+    const layerDampX = dampXVal * (L + 1) * 0.3;
+    const layerDampY = dampYVal * (L + 1) * 0.3;
+    const pts = [];
+
+    for (let i = 0; i <= totalPoints; i++) {
+      const t = i * dt;
+      let x, y;
+
+      if (drawMode === 'linear') {
+        // Linear Pendulum: Lissajous
+        x = cx + radius * Math.sin((fX + layerW) * t + layerPhase) * Math.exp(-layerDampX * t);
+        y = cy + radius * Math.sin(fY * t) * Math.exp(-layerDampY * t);
+
+      } else if (drawMode === 'epi') {
+        // Epi Pendulum: Spirograph (epicyclic)
+        // R = outer radius, r = inner radius, d = pen distance
+        const R = radius * 0.7;
+        const r = R * fY / (fX + fY + layerW * 10);
+        const d = r * (0.6 + layerPhase * 0.3);
+        const decay = Math.exp(-layerDampX * t * 0.5);
+        x = cx + ((R - r) * Math.cos(t) + d * Math.cos((R - r) / r * t)) * decay;
+        y = cy + ((R - r) * Math.sin(t) - d * Math.sin((R - r) / r * t)) * decay;
+
+      } else if (drawMode === 'rotary') {
+        // Rotary Pendulum: Two-pendulum harmonograph
+        const f3 = fX * 0.7 + layerW;
+        const f4 = fY * 1.3;
+        const a3 = radius * 0.4;
+        const decay1 = Math.exp(-layerDampX * t);
+        const decay2 = Math.exp(-layerDampY * t * 0.8);
+        x = cx + radius * 0.6 * Math.sin((fX + layerW) * t + layerPhase) * decay1
+              + a3 * Math.sin(f3 * t + Math.PI / 4) * decay2;
+        y = cy + radius * 0.6 * Math.sin(fY * t) * decay1
+              + a3 * Math.sin(f4 * t) * decay2;
+      }
+
+      pts.push({ x, y, progress: i / totalPoints });
+    }
+    allPoints.push(pts);
+  }
+
+  // Animate
+  let drawn = 0;
+  const step = speed * 3;
+  isDrawing = true;
+  document.getElementById('canvasWrap').classList.add('drawing');
+
+  ctx.clearRect(0, 0, w, h);
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'round';
+
+  function frame() {
+    const batchEnd = Math.min(drawn + step, totalPoints);
+
+    for (let L = 0; L < layers; L++) {
+      const pts = allPoints[L];
+
+      for (let i = drawn; i < batchEnd; i++) {
+        if (i === 0) continue;
+        ctx.beginPath();
+        ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
+        ctx.lineTo(pts[i].x, pts[i].y);
+        ctx.strokeStyle = getColor(pts[i].progress, L, layers);
+        ctx.lineWidth = 1.5 - L * 0.1;
+        ctx.stroke();
+      }
+    }
+
+    drawn = batchEnd;
+    document.getElementById('statusRight').textContent = `POINTS: ${(drawn * layers).toLocaleString()}`;
+    document.getElementById('canvasLabel').textContent = `drawing... ${Math.round(drawn / totalPoints * 100)}%`;
+
+    if (drawn < totalPoints) {
+      animFrame = requestAnimationFrame(frame);
+    } else {
+      isDrawing = false;
+      document.getElementById('canvasWrap').classList.remove('drawing');
+      document.getElementById('canvasLabel').textContent = `${(totalPoints * layers).toLocaleString()} points rendered`;
+      document.getElementById('drawBtn').textContent = '▶ DRAW';
+    }
+  }
+
+  document.getElementById('drawBtn').textContent = '⏸ DRAWING...';
+  animFrame = requestAnimationFrame(frame);
+}
+
+// ─── Init ─────────────────────────────────────────────────────
+
+// Check URL hash for mode (from popup deep links)
+const hashMode = location.hash.replace('#', '');
+if (['linear', 'epi', 'rotary'].includes(hashMode)) {
+  setMode(hashMode);
+}
+selectElement(3); // Start with Fourth (3:4)
+</script>
+
+</body>
+</html>

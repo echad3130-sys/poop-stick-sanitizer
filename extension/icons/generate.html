@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Icon Gen</title></head>
+<body style="background:#222;color:#fff;font-family:monospace;padding:20px">
+<h2>Harmona Graph — Icon Generator</h2>
+<p>Right-click each icon → Save as → put in extension/icons/</p>
+<div style="display:flex;gap:20px;align-items:end;margin-top:20px">
+  <div><canvas id="c16" width="16" height="16"></canvas><br>16×16</div>
+  <div><canvas id="c48" width="48" height="48"></canvas><br>48×48</div>
+  <div><canvas id="c128" width="128" height="128"></canvas><br>128×128</div>
+</div>
+<div id="links" style="margin-top:20px"></div>
+<script>
+function drawIcon(id, size) {
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  const cx = size/2, cy = size/2, r = size * 0.35;
+
+  ctx.fillStyle = '#0a0a12';
+  ctx.fillRect(0, 0, size, size);
+
+  ctx.strokeStyle = '#f1df6f';
+  ctx.lineWidth = Math.max(1, size * 0.04);
+  ctx.beginPath();
+  for (let i = 0; i <= 600; i++) {
+    const t = i / 600 * Math.PI * 2 * 4;
+    const x = cx + r * Math.sin(3 * t);
+    const y = cy + r * Math.sin(4 * t);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Border
+  ctx.strokeStyle = '#f1df6f44';
+  ctx.lineWidth = Math.max(1, size * 0.06);
+  ctx.strokeRect(1, 1, size-2, size-2);
+
+  // Create download link
+  const link = document.createElement('a');
+  link.href = canvas.toDataURL('image/png');
+  link.download = `icon${size}.png`;
+  link.textContent = `⬇ icon${size}.png`;
+  link.style.cssText = 'color:#f1df6f;display:block;margin:4px 0';
+  document.getElementById('links').appendChild(link);
+}
+
+drawIcon('c16', 16);
+drawIcon('c48', 48);
+drawIcon('c128', 128);
+</script>
+</body></html>

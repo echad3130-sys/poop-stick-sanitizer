@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body {
+  width: 300px;
+  background: #0a0a12;
+  color: #ff9944;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  padding: 16px;
+  margin: 0;
+}
+h2 {
+  font-size: 16px;
+  color: #f1df6f;
+  margin: 0 0 8px;
+  letter-spacing: 2px;
+}
+p {
+  font-size: 12px;
+  margin: 4px 0;
+  opacity: 0.8;
+}
+.btn {
+  display: block;
+  width: 100%;
+  background: #f1df6f;
+  color: #0a0a12;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  letter-spacing: 1px;
+}
+.btn:hover { filter: brightness(1.1); }
+.modes {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.mode-pill {
+  flex: 1;
+  background: rgba(153,153,255,0.15);
+  border: 1px solid rgba(153,153,255,0.3);
+  color: #9999ff;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+.mode-pill:hover {
+  background: rgba(153,153,255,0.3);
+}
+</style>
+</head>
+<body>
+  <h2>HARMONA GRAPH</h2>
+  <p>Frequency paints the curve.</p>
+  <p>🎵 Linear · Epi · Rotary</p>
+
+  <div class="modes">
+    <div class="mode-pill" onclick="openTab('linear')">Linear</div>
+    <div class="mode-pill" onclick="openTab('epi')">Epi</div>
+    <div class="mode-pill" onclick="openTab('rotary')">Rotary</div>
+  </div>
+
+  <button class="btn" onclick="openFull()">▶ OPEN FULL</button>
+
+  <script>
+    function openFull() {
+      chrome.tabs.create({ url: chrome.runtime.getURL('harmonograph.html') });
+      window.close();
+    }
+    function openTab(mode) {
+      chrome.tabs.create({ url: chrome.runtime.getURL('harmonograph.html#' + mode) });
+      window.close();
+    }
+  </script>
+</body>
+</html>
