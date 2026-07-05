@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRO_GARDEN // Trappist TEE9 Array</title>
+<meta name="description" content="PRO_GARDEN sovereign command console — Trappist TEE9 Array interface for BOOKMARK WEAVER, DIPLOMACY ORBIT, CARE TREASURY, u.flow CORE, and PSY_OP_LOVE_CARE node orchestration.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   PRO_GARDEN // Trappist TEE9 Array
+   Sovereign Command Console — Dark Monastic Aesthetic
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  --bg-void: #050506;
+  --bg-surface: #0a0a0c;
+  --bg-elevated: #0f0f12;
+  --bg-card: #111116;
+  --border-dim: rgba(203, 213, 225, 0.06);
+  --border-subtle: rgba(203, 213, 225, 0.1);
+  --border-medium: rgba(203, 213, 225, 0.15);
+  --text-primary: #cbd5e1;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-white: #f1f5f9;
+
+  /* Node accent colors */
+  --amber: #f59e0b;
+  --amber-bg: #78350f;
+  --amber-dim: rgba(245, 158, 11, 0.08);
+  --amber-glow: rgba(245, 158, 11, 0.15);
+
+  --violet: #8b5cf6;
+  --violet-bg: #4c1d95;
+  --violet-dim: rgba(139, 92, 246, 0.08);
+  --violet-glow: rgba(139, 92, 246, 0.15);
+
+  --emerald: #34d399;
+  --emerald-bg: #064e3b;
+  --emerald-dim: rgba(52, 211, 153, 0.08);
+  --emerald-glow: rgba(52, 211, 153, 0.15);
+
+  --red: #f87171;
+  --red-bg: #450a0a;
+  --red-dim: rgba(248, 113, 113, 0.08);
+  --red-glow: rgba(248, 113, 113, 0.15);
+
+  --cyan: #22d3ee;
+  --cyan-bg: #164e63;
+  --cyan-dim: rgba(34, 211, 238, 0.08);
+  --cyan-glow: rgba(34, 211, 238, 0.15);
+
+  --orange: #fb923c;
+  --orange-bg: #7c2d12;
+  --orange-dim: rgba(251, 146, 60, 0.08);
+  --orange-glow: rgba(251, 146, 60, 0.15);
+
+  --exhale-amber: #fbbf24;
+
+  --sidebar-width: 320px;
+  --right-width: 320px;
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ─── Custom Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(203, 213, 225, 0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(203, 213, 225, 0.18); }
+* { scrollbar-width: thin; scrollbar-color: rgba(203,213,225,0.1) transparent; }
+
+/* ═══════════════════════════════════════════════════
+   RED SCANLINE OVERLAY
+   ═══════════════════════════════════════════════════ */
+.scanline-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: linear-gradient(transparent 50%, rgba(255, 0, 0, 0.035) 50%);
+  background-size: 100% 4px;
+  animation: scan 4s linear infinite;
+}
+
+@keyframes scan {
+  from { transform: translateY(0); }
+  to   { transform: translateY(4px); }
+}
+
+/* ═══════════════════════════════════════════════════
+   THREE-COLUMN LAYOUT
+   ═══════════════════════════════════════════════════ */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ─── LEFT SIDEBAR ─── */
+.sidebar-left {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: rgba(10, 10, 14, 0.85);
+  backdrop-filter: blur(40px) saturate(1.2);
+  -webkit-backdrop-filter: blur(40px) saturate(1.2);
+  border-right: 1px solid var(--border-dim);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 24px 16px;
+  gap: 8px;
+  position: relative;
+  z-index: 10;
+}
+
+/* ─── MAIN CONTENT ─── */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 48px;
+  position: relative;
+  z-index: 5;
+}
+
+/* ─── RIGHT PANEL ─── */
+.sidebar-right {
+  width: var(--right-width);
+  min-width: var(--right-width);
+  background: rgba(10, 10, 14, 0.85);
+  backdrop-filter: blur(40px) saturate(1.2);
+  -webkit-backdrop-filter: blur(40px) saturate(1.2);
+  border-left: 1px solid var(--border-dim);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 24px 16px;
+  position: relative;
+  z-index: 10;
+}
+
+/* ═══════════════════════════════════════════════════
+   H&R LOGO BADGE
+   ═══════════════════════════════════════════════════ */
+.hr-badge {
+  width: 44px;
+  height: 44px;
+  background: #ffffff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+  color: #000000;
+  letter-spacing: -0.5px;
+  box-shadow:
+    0 0 20px rgba(255, 255, 255, 0.08),
+    0 0 40px rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+}
+
+/* ─── Sidebar Header ─── */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+
+.sidebar-title {
+  font-weight: 900;
+  font-size: 15px;
+  color: #ffffff;
+  letter-spacing: -0.04em;
+  font-style: italic;
+  line-height: 1.1;
+}
+
+.sidebar-subtitle {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ─── Sidebar Divider ─── */
+.sidebar-divider {
+  height: 1px;
+  background: var(--border-dim);
+  margin: 12px 0;
+}
+
+/* ─── Sidebar Section Label ─── */
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+
+/* ═══════════════════════════════════════════════════
+   NAV BUTTONS
+   ═══════════════════════════════════════════════════ */
+.nav-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  position: relative;
+}
+
+.nav-btn:hover {
+  background: rgba(203, 213, 225, 0.04);
+  color: var(--text-primary);
+}
+
+.nav-btn .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.nav-btn .label {
+  flex: 1;
+  line-height: 1.3;
+}
+
+.nav-btn .label-sub {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* Active states per node color */
+.nav-btn.active { color: #ffffff; font-weight: 600; }
+
+.nav-btn.active[data-node="bookmark"] {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+.nav-btn.active[data-node="bookmark"] .dot {
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.nav-btn.active[data-node="diplomacy"] {
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+.nav-btn.active[data-node="diplomacy"] .dot {
+  background: var(--violet);
+  box-shadow: 0 0 8px var(--violet);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.nav-btn.active[data-node="care"] {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.2);
+}
+.nav-btn.active[data-node="care"] .dot {
+  background: var(--emerald);
+  box-shadow: 0 0 8px var(--emerald);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.nav-btn.active[data-node="uflow"] {
+  background: rgba(34, 211, 238, 0.12);
+  border-color: rgba(34, 211, 238, 0.2);
+}
+.nav-btn.active[data-node="uflow"] .dot {
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.nav-btn.active[data-node="psyop"] {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.2);
+}
+.nav-btn.active[data-node="psyop"] .dot {
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.nav-btn.active[data-node="machine"] {
+  background: rgba(251, 146, 60, 0.12);
+  border-color: rgba(251, 146, 60, 0.2);
+}
+.nav-btn.active[data-node="machine"] .dot {
+  background: var(--orange);
+  box-shadow: 0 0 8px var(--orange);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Inactive dot colors */
+.nav-btn[data-node="bookmark"] .dot { background: rgba(245, 158, 11, 0.4); }
+.nav-btn[data-node="diplomacy"] .dot { background: rgba(139, 92, 246, 0.4); }
+.nav-btn[data-node="care"] .dot { background: rgba(52, 211, 153, 0.4); }
+.nav-btn[data-node="uflow"] .dot { background: rgba(34, 211, 238, 0.4); }
+.nav-btn[data-node="psyop"] .dot { background: rgba(248, 113, 113, 0.4); }
+.nav-btn[data-node="machine"] .dot { background: rgba(251, 146, 60, 0.4); }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* ═══════════════════════════════════════════════════
+   MAIN CONTENT AREA
+   ═══════════════════════════════════════════════════ */
+.node-panel { display: none; }
+.node-panel.active { display: block; animation: fadeIn 0.35s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Status badge pill */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.status-badge .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.status-badge.amber    { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-glow); }
+.status-badge.amber .status-dot { background: var(--amber); }
+.status-badge.violet   { background: var(--violet-dim); color: var(--violet); border: 1px solid var(--violet-glow); }
+.status-badge.violet .status-dot { background: var(--violet); }
+.status-badge.emerald  { background: var(--emerald-dim); color: var(--emerald); border: 1px solid var(--emerald-glow); }
+.status-badge.emerald .status-dot { background: var(--emerald); }
+.status-badge.cyan     { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-glow); }
+.status-badge.cyan .status-dot { background: var(--cyan); }
+.status-badge.red      { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-glow); }
+.status-badge.red .status-dot { background: var(--red); }
+.status-badge.orange   { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-glow); }
+.status-badge.orange .status-dot { background: var(--orange); }
+
+/* Node Title */
+.node-title {
+  font-weight: 900;
+  font-size: 40px;
+  color: #ffffff;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 8px;
+}
+
+.node-title-sub {
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+  margin-bottom: 28px;
+}
+
+/* Node description */
+.node-desc {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 680px;
+  margin-bottom: 32px;
+}
+
+/* Info Cards */
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.info-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 22px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.info-card:hover {
+  border-color: var(--border-medium);
+  transform: translateY(-1px);
+}
+
+.info-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.info-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.info-card-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-white);
+  letter-spacing: -0.02em;
+}
+
+.info-card-body {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.info-card-body ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 6px;
+}
+
+.info-card-body li {
+  padding: 4px 0;
+  position: relative;
+  padding-left: 16px;
+}
+
+.info-card-body li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.info-card-body code {
+  font-family: 'Inter', monospace;
+  font-size: 11px;
+  background: rgba(203, 213, 225, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+/* Card accent colors */
+.info-card.amber .info-card-icon    { background: var(--amber-bg); color: var(--amber); }
+.info-card.violet .info-card-icon   { background: var(--violet-bg); color: var(--violet); }
+.info-card.emerald .info-card-icon  { background: var(--emerald-bg); color: var(--emerald); }
+.info-card.cyan .info-card-icon     { background: var(--cyan-bg); color: var(--cyan); }
+.info-card.red .info-card-icon      { background: var(--red-bg); color: var(--red); }
+.info-card.orange .info-card-icon   { background: var(--orange-bg); color: var(--orange); }
+
+/* Action Buttons */
+.action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.action-btn.primary {
+  background: rgba(255,255,255,0.08);
+  color: #ffffff;
+  border-color: rgba(255,255,255,0.12);
+}
+.action-btn.primary:hover {
+  background: rgba(255,255,255,0.14);
+  transform: translateY(-1px);
+}
+
+.action-btn.amber   { background: var(--amber-dim); color: var(--amber); border-color: var(--amber-glow); }
+.action-btn.amber:hover { background: rgba(245,158,11,0.18); }
+.action-btn.violet  { background: var(--violet-dim); color: var(--violet); border-color: var(--violet-glow); }
+.action-btn.violet:hover { background: rgba(139,92,246,0.18); }
+.action-btn.emerald { background: var(--emerald-dim); color: var(--emerald); border-color: var(--emerald-glow); }
+.action-btn.emerald:hover { background: rgba(52,211,153,0.18); }
+.action-btn.cyan    { background: var(--cyan-dim); color: var(--cyan); border-color: var(--cyan-glow); }
+.action-btn.cyan:hover { background: rgba(34,211,238,0.18); }
+.action-btn.red     { background: var(--red-dim); color: var(--red); border-color: var(--red-glow); }
+.action-btn.red:hover { background: rgba(248,113,113,0.18); }
+.action-btn.orange  { background: var(--orange-dim); color: var(--orange); border-color: var(--orange-glow); }
+.action-btn.orange:hover { background: rgba(251,146,60,0.18); }
+
+/* ═══════════════════════════════════════════════════
+   RIGHT PANEL — Execution State
+   ═══════════════════════════════════════════════════ */
+.right-header {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.exec-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.exec-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.exec-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-white);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.exec-dot.amber { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.exec-dot.violet { background: var(--violet); box-shadow: 0 0 6px var(--violet); }
+.exec-dot.emerald { background: var(--emerald); box-shadow: 0 0 6px var(--emerald); }
+.exec-dot.cyan { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+.exec-dot.red { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.exec-dot.orange { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+
+/* Right panel node metadata */
+.right-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-top: 4px;
+}
+
+.right-meta span {
+  display: block;
+}
+
+/* Right panel footer / sentinel */
+.right-footer {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-dim);
+}
+
+.sentinel-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.sentinel-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.sentinel-value {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.sentinel-value .indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.indicator.active-scan {
+  background: var(--red-dim);
+  color: var(--red);
+  border: 1px solid var(--red-glow);
+}
+
+.sentinel-msg {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE / RESPONSIVE
+   ═══════════════════════════════════════════════════ */
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: rgba(5, 5, 6, 0.95);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid var(--border-dim);
+  z-index: 100;
+  padding: 0 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hamburger {
+  width: 40px;
+  height: 40px;
+  background: rgba(203, 213, 225, 0.06);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hamburger:hover { background: rgba(203, 213, 225, 0.1); }
+
+.hamburger span {
+  width: 18px;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.mobile-title {
+  font-weight: 900;
+  font-size: 14px;
+  color: #ffffff;
+  font-style: italic;
+  letter-spacing: -0.04em;
+}
+
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 45;
+}
+.mobile-overlay.show { display: block; }
+
+@media (max-width: 1100px) {
+  .sidebar-right { display: none; }
+}
+
+@media (max-width: 860px) {
+  .mobile-header { display: flex; }
+
+  .sidebar-left {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 60;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    padding-top: 72px;
+  }
+
+  .sidebar-left.open { transform: translateX(0); }
+
+  .sidebar-right { display: none; }
+
+  .main-content {
+    padding: 72px 20px 32px;
+  }
+
+  .node-title { font-size: 28px; }
+  .info-cards { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════
+   AMBIENT GLOW ACCENTS
+   ═══════════════════════════════════════════════════ */
+.main-content::before {
+  content: '';
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle grid pattern on main */
+.main-content::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(203, 213, 225, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(203, 213, 225, 0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.node-panel { position: relative; z-index: 1; }
+
+/* ═══════════════════════════════════════════════════
+   EXHALE LEDGER indicator
+   ═══════════════════════════════════════════════════ */
+.exhale-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--exhale-amber);
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.15);
+  margin-top: 8px;
+}
+
+/* ─── Array Visualization ─── */
+.array-visual {
+  display: flex;
+  gap: 3px;
+  margin: 12px 0;
+}
+
+.array-bar {
+  width: 3px;
+  height: 24px;
+  border-radius: 2px;
+  opacity: 0.4;
+  animation: array-pulse 3s ease-in-out infinite;
+}
+
+.array-bar:nth-child(odd) { animation-delay: 0.5s; }
+.array-bar:nth-child(3n) { animation-delay: 1s; }
+.array-bar:nth-child(4n) { animation-delay: 1.5s; }
+
+@keyframes array-pulse {
+  0%, 100% { opacity: 0.3; height: 16px; }
+  50% { opacity: 0.7; height: 28px; }
+}
+
+/* URL list in cards */
+.url-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.url-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-dim);
+  font-size: 11px;
+  word-break: break-all;
+}
+
+.url-list li:last-child { border-bottom: none; }
+
+.url-list code {
+  font-family: 'Inter', monospace;
+  font-size: 11px;
+  color: var(--cyan);
+  background: rgba(34, 211, 238, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ═══ SCANLINE OVERLAY ═══ -->
+<div class="scanline-overlay" aria-hidden="true"></div>
+
+<!-- ═══ MOBILE HEADER ═══ -->
+<div class="mobile-header" id="mobileHeader">
+  <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <span class="mobile-title">PRO_GARDEN</span>
+  <div class="hr-badge" style="width:34px;height:34px;font-size:11px;">H&R</div>
+</div>
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- ═══ APP SHELL ═══ -->
+<div class="app-shell">
+
+  <!-- ─── LEFT SIDEBAR ─── -->
+  <aside class="sidebar-left" id="sidebarLeft">
+    <div class="sidebar-header">
+      <div class="hr-badge">H&R</div>
+      <div>
+        <div class="sidebar-title">PRO_GARDEN</div>
+        <div class="sidebar-subtitle">Trappist TEE9 Array</div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section-label">Active Nodes</div>
+
+    <button class="nav-btn active" data-node="uflow" id="nav-uflow">
+      <div class="dot"></div>
+      <div class="label">
+        u.flow CORE
+        <span class="label-sub">Self-Hosted GitLab Priority</span>
+      </div>
+    </button>
+
+    <button class="nav-btn" data-node="bookmark" id="nav-bookmark">
+      <div class="dot"></div>
+      <div class="label">
+        BOOKMARK WEAVER
+        <span class="label-sub">Knowledge Treasury Ingest</span>
+      </div>
+    </button>
+
+    <button class="nav-btn" data-node="diplomacy" id="nav-diplomacy">
+      <div class="dot"></div>
+      <div class="label">
+        DIPLOMACY ORBIT
+        <span class="label-sub">Sovereign Protection Layer</span>
+      </div>
+    </button>
+
+    <button class="nav-btn" data-node="care" id="nav-care">
+      <div class="dot"></div>
+      <div class="label">
+        CARE TREASURY
+        <span class="label-sub">Knowledge Ingestion Layer</span>
+      </div>
+    </button>
+
+    <button class="nav-btn" data-node="psyop" id="nav-psyop">
+      <div class="dot"></div>
+      <div class="label">
+        PSY_OP_LOVE_CARE
+        <span class="label-sub">Perimeter Filter</span>
+      </div>
+    </button>
+
+    <button class="nav-btn" data-node="machine" id="nav-machine">
+      <div class="dot"></div>
+      <div class="label">
+        MACHINE SERVICE
+        <span class="label-sub">Technical Ancestry Node</span>
+      </div>
+    </button>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section-label">System</div>
+
+    <div class="exhale-indicator">
+      <span style="font-size:14px;">☽</span> EXHALE LEDGER • NOMINAL
+    </div>
+
+    <div class="array-visual">
+      <div class="array-bar" style="background:var(--amber);"></div>
+      <div class="array-bar" style="background:var(--violet);"></div>
+      <div class="array-bar" style="background:var(--emerald);"></div>
+      <div class="array-bar" style="background:var(--cyan);"></div>
+      <div class="array-bar" style="background:var(--red);"></div>
+      <div class="array-bar" style="background:var(--orange);"></div>
+      <div class="array-bar" style="background:var(--amber);"></div>
+      <div class="array-bar" style="background:var(--violet);"></div>
+      <div class="array-bar" style="background:var(--emerald);"></div>
+      <div class="array-bar" style="background:var(--cyan);"></div>
+      <div class="array-bar" style="background:var(--red);"></div>
+      <div class="array-bar" style="background:var(--orange);"></div>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <main class="main-content" id="mainContent">
+
+    <!-- ══════════ BOOKMARK WEAVER ══════════ -->
+    <section class="node-panel" id="panel-bookmark">
+      <div class="status-badge amber">
+        <span class="status-dot"></span>
+        NODE ACTIVE
+      </div>
+
+      <h1 class="node-title">BOOKMARK WEAVER</h1>
+      <div class="node-title-sub">KNOWLEDGE TREASURY INGEST</div>
+
+      <p class="node-desc">
+        2.28 MB bookmark archive (<code>bookmarks_3_18_26.html</code>). Parsing crypto, trading, AI, sovereign tech,
+        creative and artistic nodes. Full ingestion pipeline active — clustering high-value signal from noise.
+      </p>
+
+      <div class="info-cards">
+        <div class="info-card amber">
+          <div class="info-card-header">
+            <div class="info-card-icon">⚡</div>
+            <div class="info-card-title">High-Value Clusters</div>
+          </div>
+          <div class="info-card-body">
+            Priority signal extraction across identified verticals:
+            <ul>
+              <li>Crypto / DeFi protocols & wallets</li>
+              <li>Trading platforms & analytics</li>
+              <li>AI tooling & model endpoints</li>
+              <li>Sovereign infrastructure & self-hosting</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-card amber">
+          <div class="info-card-header">
+            <div class="info-card-icon">✦</div>
+            <div class="info-card-title">Creative / 18F+ Signal</div>
+          </div>
+          <div class="info-card-body">
+            Artistic and creative node detection:
+            <ul>
+              <li>DeviantArt collection archived</li>
+              <li>v2969flow repos flagged for review</li>
+              <li>Creative media assets catalogued</li>
+              <li>Signal-to-noise ratio: high confidence</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn amber">⟐ Parse Archive</button>
+        <button class="action-btn primary">View Clusters</button>
+      </div>
+    </section>
+
+    <!-- ══════════ DIPLOMACY ORBIT ══════════ -->
+    <section class="node-panel" id="panel-diplomacy">
+      <div class="status-badge violet">
+        <span class="status-dot"></span>
+        NODE ACTIVE
+      </div>
+
+      <h1 class="node-title">DIPLOMACY ORBIT</h1>
+      <div class="node-title-sub">SOVEREIGN PROTECTION LAYER</div>
+
+      <p class="node-desc">
+        Diplomacy.Console vJ.2025 ingested. This layer sits between the PSY_OP_LOVE_CARE perimeter and the inner
+        Care Treasury — mediating signal flow, enforcing reputation budgets, and managing sovereign consent protocols.
+      </p>
+
+      <div class="info-cards">
+        <div class="info-card violet">
+          <div class="info-card-header">
+            <div class="info-card-icon">⊕</div>
+            <div class="info-card-title">ConSealMint Protocol</div>
+          </div>
+          <div class="info-card-body">
+            Consent-sealed sovereignty enforcement:
+            <ul>
+              <li>Reputation Budget — calibrated per-interaction</li>
+              <li>Care / Aether / Praxis signal triangulation</li>
+              <li>Lock/Unlock state machine active</li>
+              <li>Threshold enforcement: sovereign consent only</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-card violet">
+          <div class="info-card-header">
+            <div class="info-card-icon">◈</div>
+            <div class="info-card-title">Casscademint Ledger</div>
+          </div>
+          <div class="info-card-body">
+            Auditable sovereignty log — every signal transition recorded:
+            <ul>
+              <li>Immutable cascade records</li>
+              <li>Sovereignty state snapshots</li>
+              <li>Conflict resolution traces</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-card violet">
+          <div class="info-card-header">
+            <div class="info-card-icon">◐</div>
+            <div class="info-card-title">Aria.Manifestation</div>
+          </div>
+          <div class="info-card-body">
+            Shadow layer protocol. Absence as signal — when Aria is silent, the space holds meaning:
+            <ul>
+              <li>Negative-space awareness</li>
+              <li>Manifestation timing engine</li>
+              <li>Shadow-state integrity checks</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn violet">⊕ View Ledger</button>
+        <button class="action-btn primary">Audit Cascade</button>
+      </div>
+    </section>
+
+    <!-- ══════════ CARE TREASURY ══════════ -->
+    <section class="node-panel" id="panel-care">
+      <div class="status-badge emerald">
+        <span class="status-dot"></span>
+        NODE ACTIVE
+      </div>
+
+      <h1 class="node-title">CARE TREASURY</h1>
+      <div class="node-title-sub">KNOWLEDGE INGESTION LAYER</div>
+
+      <p class="node-desc">
+        Inner sanctum for sovereign knowledge. Proof-of-Care wiki layer — Gate 18, Womb Ship, feminine guardian nodes.
+        Knowledge enters here only after passing the Diplomacy Orbit and receiving sovereign consent.
+      </p>
+
+      <div class="info-cards">
+        <div class="info-card emerald">
+          <div class="info-card-header">
+            <div class="info-card-icon">♡</div>
+            <div class="info-card-title">Medicine Singer Connection</div>
+          </div>
+          <div class="info-card-body">
+            Core treasury node — feminine guardian activated:
+            <ul>
+              <li>Medicine Singer protocol: engaged</li>
+              <li>Gate 18 resonance field: stable</li>
+              <li>Womb Ship navigation: calibrated</li>
+              <li>Guardian node uptime: continuous</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-card emerald">
+          <div class="info-card-header">
+            <div class="info-card-icon">⊞</div>
+            <div class="info-card-title">Proof-of-Care Wiki</div>
+          </div>
+          <div class="info-card-body">
+            Sovereign knowledge base with care-validated entries:
+            <ul>
+              <li>Wiki ingestion pipeline: active</li>
+              <li>Local-first storage: encrypted at rest</li>
+              <li>Integration with u.flow CORE</li>
+              <li>Care-stamp verification: all entries</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-card emerald">
+          <div class="info-card-header">
+            <div class="info-card-icon">⬡</div>
+            <div class="info-card-title">Local Pipeline</div>
+          </div>
+          <div class="info-card-body">
+            Self-hosted knowledge processing:
+            <ul>
+              <li>Air-gapped ingestion available</li>
+              <li>Sovereign data never leaves perimeter</li>
+              <li>Redundant backup: 3-site replication</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn emerald">♡ Enter Treasury</button>
+        <button class="action-btn primary">Verify Care-Stamps</button>
+      </div>
+    </section>
+
+    <!-- ══════════ u.flow CORE ══════════ -->
+    <section class="node-panel active" id="panel-uflow">
+      <div class="status-badge cyan">
+        <span class="status-dot"></span>
+        NODE ACTIVE
+      </div>
+
+      <h1 class="node-title">u.flow CORE</h1>
+      <div class="node-title-sub">SELF-HOSTED GITLAB PRIORITY</div>
+
+      <p class="node-desc">
+        v2969flow + Proof-of-Care wikis prioritized from self-hosted GitLab instances.
+        All sovereign repositories indexed and monitored for upstream changes.
+      </p>
+
+      <div class="info-cards">
+        <div class="info-card cyan" style="grid-column: 1 / -1;">
+          <div class="info-card-header">
+            <div class="info-card-icon">⎔</div>
+            <div class="info-card-title">Prioritized Resources</div>
+          </div>
+          <div class="info-card-body">
+            <ul class="url-list">
+              <li><code>gitlab.v01.one.us.org/u-flow/proof-of-care/-/wikis/υ.flow.log—v.2969.09</code></li>
+              <li><code>gitlab.v01.one.us.org/J-Loop/u.flow</code></li>
+              <li><code>gitlab.v01.one.us.org/J-Loop/u.flow/-/wikis/✅-migrate-caches.bat</code></li>
+              <li><code>gitlab.com/syntaxgarden/Formagal/forum</code> <span style="color:var(--text-muted);font-size:10px;">commit 5fda0c3</span></li>
+              <li><code>gitlab.com/communityus/legals/-/wikis/docusaurus</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn cyan">⎔ Sync Repos</button>
+        <button class="action-btn primary">View Diffs</button>
+      </div>
+    </section>
+
+    <!-- ══════════ PSY_OP_LOVE_CARE ══════════ -->
+    <section class="node-panel" id="panel-psyop">
+      <div class="status-badge red">
+        <span class="status-dot"></span>
+        NODE ACTIVE
+      </div>
+
+      <h1 class="node-title">PSY_OP_LOVE_CARE</h1>
+      <div class="node-title-sub">PERIMETER FILTER</div>
+
+      <p class="node-desc">
+        Outermost protection layer. Love &amp; Care filter engaged on sensitive clusters.
+        All inbound signal passes through this perimeter before reaching the Diplomacy Orbit.
+        Hostile pattern detection active — zero-trust ingestion model.
+      </p>
+
+      <div class="info-cards">
+        <div class="info-card red">
+          <div class="info-card-header">
+            <div class="info-card-icon">⊘</div>
+            <div class="info-card-title">Perimeter Filter Status</div>
+          </div>
+          <div class="info-card-body">
+            Active threat monitoring and signal filtering:
+            <ul>
+              <li>Love &amp; Care heuristic: engaged</li>
+              <li>Hostile pattern detector: scanning</li>
+              <li>False-positive rate: &lt; 0.02%</li>
+              <li>Last incident: none in current epoch</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-card red">
+          <div class="info-card-header">
+            <div class="info-card-icon">⊗</div>
+            <div class="info-card-title">Protection Protocols</div>
+          </div>
+          <div class="info-card-body">
+            Multi-layer defense architecture:
+            <ul>
+              <li>Layer 0: Care-first intent analysis</li>
+              <li>Layer 1: Semantic threat classification</li>
+              <li>Layer 2: Behavioral anomaly detection</li>
+              <li>Layer 3: Sovereign boundary enforcement</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn red">⊘ View Perimeter</button>
+        <button class="action-btn primary">Run Diagnostic</button>
+      </div>
+    </section>
+
+    <!-- ══════════ MACHINE SERVICE ══════════ -->
+    <section class="node-panel" id="panel-machine">
+      <div class="status-badge orange">
+        <span class="status-dot"></span>
+        NODE ACTIVE
+      </div>
+
+      <h1 class="node-title">MACHINE SERVICE</h1>
+      <div class="node-title-sub">TECHNICAL ANCESTRY NODE</div>
+
+      <p class="node-desc">
+        Historical GitLab activity and technical research logs. Infrastructure, game dev,
+        AI generation, and server ancestry. A living archive of technical lineage — every
+        commit a fossil record of sovereign engineering.
+      </p>
+
+      <div class="info-cards" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="info-card orange">
+          <div class="info-card-header">
+            <div class="info-card-icon">⚙</div>
+            <div class="info-card-title">Infrastructure &amp; Self-Hosting</div>
+          </div>
+          <div class="info-card-body">
+            Sovereign infrastructure lineage:
+            <ul>
+              <li>HomelabOS (NickBusey) — homelab orchestration</li>
+              <li>GitLab omnibus SSH/push configuration</li>
+              <li>Peertube + Kubectl YAML configs</li>
+              <li>WSL2 / Docker Desktop patterns (recurring)</li>
+              <li>CUDA scripts (communityus/legals)</li>
+              <li>Docker search &amp; container archaeology</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-card orange">
+          <div class="info-card-header">
+            <div class="info-card-icon">🎮</div>
+            <div class="info-card-title">Game Engine &amp; Modding</div>
+          </div>
+          <div class="info-card-body">
+            Game development archaeology:
+            <ul>
+              <li>OpenMW issues (Collada plugin, integration tests)</li>
+              <li>AnyRPGCore merge requests</li>
+              <li>Star Citizen modding (Starfab guides) + Nova Navigator</li>
+              <li>Armagetronad references</li>
+              <li>Perl Game::Entities</li>
+              <li>3D assets &amp; player model pipelines</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-card orange">
+          <div class="info-card-header">
+            <div class="info-card-icon">✧</div>
+            <div class="info-card-title">AI &amp; Tooling Experiments</div>
+          </div>
+          <div class="info-card-body">
+            Early AI generation and tooling logs:
+            <ul>
+              <li>AIDungeon related repos (communityus-llc)</li>
+              <li>Image gen logs: "scifi_steampunk_machine_screens"</li>
+              <li>Image gen logs: "cyberpunk_boy_sitting"</li>
+              <li>Inference steps, guidance, batch scores tracked</li>
+              <li>Huffman Hifi series (gunshow, minigolf, cloud)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-card orange">
+          <div class="info-card-header">
+            <div class="info-card-icon">📋</div>
+            <div class="info-card-title">Documentation &amp; Legal</div>
+          </div>
+          <div class="info-card-body">
+            Knowledge codification layer:
+            <ul>
+              <li>Docusaurus wikis under communityus/legals</li>
+              <li>Windows hostname "Multiverse" references</li>
+              <li>Secrets and training wikis</li>
+              <li>Legal framework documentation</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn orange">⚙ Explore Ancestry</button>
+        <button class="action-btn primary">View Timeline</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── RIGHT PANEL ─── -->
+  <aside class="sidebar-right" id="sidebarRight">
+    <div class="right-header">Execution State</div>
+
+    <div class="exec-block" id="exec-state-block">
+      <div class="exec-label">Current Node</div>
+      <div class="exec-value" id="exec-node-name">
+        <span class="exec-dot cyan"></span>
+        u.flow CORE • ACTIVE
+      </div>
+      <div class="right-meta" id="exec-meta">
+        <span>Protocol: Self-Hosted GitLab Priority</span>
+        <span>Repos: v2969flow, Proof-of-Care</span>
+        <span>Status: Syncing</span>
+      </div>
+    </div>
+
+    <div class="exec-block">
+      <div class="exec-label">TEE9 Array Status</div>
+      <div class="exec-value">
+        <span class="exec-dot emerald"></span>
+        NOMINAL
+      </div>
+      <div class="right-meta">
+        <span>Nodes online: 6 / 6</span>
+        <span>Array integrity: 100%</span>
+      </div>
+    </div>
+
+    <div class="exec-block">
+      <div class="exec-label">Signal Pipeline</div>
+      <div class="right-meta" id="pipeline-status">
+        <span>Ingest → PSY_OP → Diplomacy → Care</span>
+        <span>Flow direction: inward</span>
+        <span>Latency: &lt; 2ms</span>
+      </div>
+    </div>
+
+    <div class="exec-block">
+      <div class="exec-label">EXHALE LEDGER</div>
+      <div class="exec-value" style="color:var(--exhale-amber);">
+        <span class="exec-dot" style="background:var(--exhale-amber); box-shadow:0 0 6px var(--exhale-amber);"></span>
+        NOMINAL
+      </div>
+      <div class="right-meta">
+        <span>Last exhale: epoch.current</span>
+        <span>Breath cycle: 4s cadence</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="right-footer">
+      <div class="sentinel-block">
+        <div class="sentinel-label">Scanline Status</div>
+        <div class="sentinel-value">
+          <span class="indicator active-scan">⊙ Red Scanline: Active</span>
+        </div>
+      </div>
+
+      <div class="sentinel-block">
+        <div class="sentinel-label">Protocol Status</div>
+        <div class="sentinel-value" id="protocol-status">
+          u.flow CORE — Self-Hosted GitLab Priority • Online
+        </div>
+      </div>
+
+      <div class="sentinel-block">
+        <div class="sentinel-label">Sentinel</div>
+        <div class="sentinel-msg">
+          🌿 The garden grows in silence. Every node is a seed, every connection a root.
+          Sovereign care sustains what sovereign will has planted.
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- /app-shell -->
+
+<script>
+/* ═══════════════════════════════════════════════════
+   PRO_GARDEN — Node Switching Engine
+   ═══════════════════════════════════════════════════ */
+(function() {
+  'use strict';
+
+  const NODES = {
+    bookmark: {
+      label: 'BOOKMARK WEAVER',
+      badge: 'amber',
+      execDot: 'amber',
+      execName: 'BOOKMARK WEAVER • ACTIVE',
+      meta: [
+        'Protocol: Knowledge Treasury Ingest',
+        'Archive: 2.28 MB',
+        'Status: Parsing'
+      ],
+      protocol: 'BOOKMARK WEAVER — Knowledge Treasury Ingest • Online'
+    },
+    diplomacy: {
+      label: 'DIPLOMACY ORBIT',
+      badge: 'violet',
+      execDot: 'violet',
+      execName: 'DIPLOMACY ORBIT • ACTIVE',
+      meta: [
+        'Protocol: Sovereign Protection Layer',
+        'Console: vJ.2025',
+        'Status: Mediating'
+      ],
+      protocol: 'DIPLOMACY ORBIT — Sovereign Protection Layer • Online'
+    },
+    care: {
+      label: 'CARE TREASURY',
+      badge: 'emerald',
+      execDot: 'emerald',
+      execName: 'CARE TREASURY • ACTIVE',
+      meta: [
+        'Protocol: Knowledge Ingestion Layer',
+        'Guardian: Medicine Singer',
+        'Status: Receiving'
+      ],
+      protocol: 'CARE TREASURY — Knowledge Ingestion Layer • Online'
+    },
+    uflow: {
+      label: 'u.flow CORE',
+      badge: 'cyan',
+      execDot: 'cyan',
+      execName: 'u.flow CORE • ACTIVE',
+      meta: [
+        'Protocol: Self-Hosted GitLab Priority',
+        'Repos: v2969flow, Proof-of-Care',
+        'Status: Syncing'
+      ],
+      protocol: 'u.flow CORE — Self-Hosted GitLab Priority • Online'
+    },
+    psyop: {
+      label: 'PSY_OP_LOVE_CARE',
+      badge: 'red',
+      execDot: 'red',
+      execName: 'PSY_OP_LOVE_CARE • ACTIVE',
+      meta: [
+        'Protocol: Perimeter Filter',
+        'Filter: Love & Care heuristic',
+        'Status: Scanning'
+      ],
+      protocol: 'PSY_OP_LOVE_CARE — Perimeter Filter • Online'
+    },
+    machine: {
+      label: 'MACHINE SERVICE',
+      badge: 'orange',
+      execDot: 'orange',
+      execName: 'MACHINE SERVICE NODE • ACTIVE',
+      meta: [
+        'Protocol: Technical Ancestry Node',
+        'Archive: GitLab historical activity',
+        'Status: Organizing technical history \uD83C\uDF3F'
+      ],
+      protocol: 'MACHINE SERVICE — Technical Ancestry Node • Online'
+    }
+  };
+
+  const navBtns    = document.querySelectorAll('.nav-btn');
+  const panels     = document.querySelectorAll('.node-panel');
+  const execName   = document.getElementById('exec-node-name');
+  const execMeta   = document.getElementById('exec-meta');
+  const protStatus = document.getElementById('protocol-status');
+
+  function switchNode(nodeId) {
+    const node = NODES[nodeId];
+    if (!node) return;
+
+    // Update nav buttons
+    navBtns.forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.querySelector(`.nav-btn[data-node="${nodeId}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // Update panels
+    panels.forEach(p => p.classList.remove('active'));
+    const activePanel = document.getElementById('panel-' + nodeId);
+    if (activePanel) activePanel.classList.add('active');
+
+    // Update right panel execution state
+    execName.innerHTML = '<span class="exec-dot ' + node.execDot + '"></span>' + node.execName;
+    execMeta.innerHTML = node.meta.map(m => '<span>' + m + '</span>').join('');
+    protStatus.textContent = node.protocol;
+
+    // Close mobile sidebar if open
+    sidebarLeft.classList.remove('open');
+    mobileOverlay.classList.remove('show');
+    hamburgerBtn.classList.remove('open');
+  }
+
+  // Bind nav buttons
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchNode(btn.dataset.node);
+    });
+  });
+
+  // Mobile hamburger
+  const hamburgerBtn  = document.getElementById('hamburgerBtn');
+  const sidebarLeft   = document.getElementById('sidebarLeft');
+  const mobileOverlay = document.getElementById('mobileOverlay');
+
+  hamburgerBtn.addEventListener('click', () => {
+    const isOpen = sidebarLeft.classList.toggle('open');
+    mobileOverlay.classList.toggle('show', isOpen);
+    hamburgerBtn.classList.toggle('open', isOpen);
+  });
+
+  mobileOverlay.addEventListener('click', () => {
+    sidebarLeft.classList.remove('open');
+    mobileOverlay.classList.remove('show');
+    hamburgerBtn.classList.remove('open');
+  });
+
+  // Action buttons — subtle press feedback
+  document.querySelectorAll('.action-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.style.transform = 'scale(0.96)';
+      setTimeout(() => { btn.style.transform = ''; }, 150);
+    });
+  });
+
+})();
+</script>
+
+</body>
+</html>
