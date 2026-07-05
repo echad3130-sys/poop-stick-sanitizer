@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEE(n) Land Hotel — First Class Service</title>
+<meta name="description" content="Welcome to TEE(n) Land Hotel. First class service from lobby to suite. Happy Birthday.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --ivory: #faf8f2;
+  --gold: #c9a96e;
+  --gold-light: #e8d5a8;
+  --gold-dark: #8b6914;
+  --charcoal: #1a1a1e;
+  --warm-black: #0f0f11;
+  --cream: #f5f0e3;
+  --teal: #2d8b84;
+  --teal-muted: #1a5c57;
+  --rose: #d4a0a0;
+  --sage: #9cad98;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--warm-black);
+  color: var(--ivory);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── Toggle Menu ────────────── */
+.toggle-menu {
+  position: fixed; top: 20px; right: 20px; z-index: 1000;
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+.toggle-btn {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: rgba(201, 169, 110, 0.15);
+  border: 1px solid rgba(201, 169, 110, 0.25);
+  backdrop-filter: blur(20px);
+  color: var(--gold); font-size: 18px;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.toggle-btn:hover {
+  background: rgba(201, 169, 110, 0.3);
+  transform: scale(1.05);
+}
+
+.toggle-panel {
+  position: fixed; top: 76px; right: 20px;
+  width: 260px; background: rgba(15, 15, 17, 0.95);
+  border: 1px solid rgba(201, 169, 110, 0.15);
+  border-radius: 16px; backdrop-filter: blur(30px);
+  padding: 16px; z-index: 999;
+  opacity: 0; pointer-events: none;
+  transform: translateY(-8px);
+  transition: all 0.25s ease;
+}
+
+.toggle-panel.open {
+  opacity: 1; pointer-events: all; transform: translateY(0);
+}
+
+.panel-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px; color: var(--gold); letter-spacing: 3px;
+  text-transform: uppercase; margin-bottom: 12px;
+  padding-bottom: 8px; border-bottom: 1px solid rgba(201, 169, 110, 0.1);
+}
+
+.panel-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px;
+  color: var(--ivory); font-size: 13px;
+  text-decoration: none; transition: all 0.15s;
+  cursor: pointer;
+}
+
+.panel-link:hover { background: rgba(201, 169, 110, 0.08); }
+
+.panel-icon { font-size: 16px; width: 24px; text-align: center; }
+
+.panel-link-label { font-weight: 500; }
+
+.panel-link-sub { font-size: 10px; color: rgba(250, 248, 242, 0.4); }
+
+.panel-divider {
+  height: 1px; background: rgba(201, 169, 110, 0.08);
+  margin: 8px 0;
+}
+
+/* ─── Hero ───────────────────── */
+.hero {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; text-align: center;
+  position: relative; overflow: hidden;
+}
+
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, rgba(201, 169, 110, 0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 50% 80%, rgba(45, 139, 132, 0.04) 0%, transparent 50%);
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 700px; padding: 40px; }
+
+.hotel-crest {
+  width: 80px; height: 80px; margin: 0 auto 24px;
+  border: 2px solid var(--gold-light);
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 32px;
+  background: rgba(201, 169, 110, 0.05);
+  animation: crest-glow 4s ease-in-out infinite;
+}
+
+@keyframes crest-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(201, 169, 110, 0.1); }
+  50% { box-shadow: 0 0 40px rgba(201, 169, 110, 0.2); }
+}
+
+.hotel-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px; font-weight: 400; letter-spacing: 8px;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.hotel-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 64px; font-weight: 300; letter-spacing: -1px;
+  line-height: 1.1; color: var(--ivory);
+  margin-bottom: 16px;
+}
+
+.hotel-title em {
+  font-style: italic; color: var(--gold);
+}
+
+.hotel-subtitle {
+  font-size: 14px; color: rgba(250, 248, 242, 0.5);
+  letter-spacing: 4px; text-transform: uppercase;
+  margin-bottom: 40px;
+}
+
+.divider {
+  width: 60px; height: 1px; background: var(--gold);
+  margin: 0 auto 40px; opacity: 0.4;
+}
+
+.hotel-tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-style: italic; font-weight: 300;
+  color: rgba(250, 248, 242, 0.7); line-height: 1.6;
+}
+
+/* ─── Services Section ───────── */
+.services {
+  padding: 100px 40px; max-width: 1000px; margin: 0 auto;
+}
+
+.section-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px; font-weight: 300; margin-bottom: 48px;
+  color: var(--ivory);
+}
+
+.service-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.service-card {
+  background: rgba(250, 248, 242, 0.02);
+  border: 1px solid rgba(201, 169, 110, 0.08);
+  border-radius: 16px; padding: 28px;
+  transition: all 0.3s;
+}
+
+.service-card:hover {
+  border-color: rgba(201, 169, 110, 0.2);
+  background: rgba(250, 248, 242, 0.04);
+  transform: translateY(-4px);
+}
+
+.service-icon { font-size: 28px; margin-bottom: 16px; }
+
+.service-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 600; margin-bottom: 8px;
+  color: var(--ivory);
+}
+
+.service-desc {
+  font-size: 13px; color: rgba(250, 248, 242, 0.5);
+  line-height: 1.6;
+}
+
+/* ─── Brochure: Parent Day ───── */
+.brochure {
+  padding: 100px 40px; max-width: 800px; margin: 0 auto;
+}
+
+.brochure-card {
+  background: linear-gradient(135deg, rgba(201, 169, 110, 0.06) 0%, rgba(45, 139, 132, 0.04) 100%);
+  border: 1px solid rgba(201, 169, 110, 0.12);
+  border-radius: 24px; padding: 48px;
+  position: relative; overflow: hidden;
+}
+
+.brochure-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--teal), var(--gold));
+}
+
+.brochure-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(201, 169, 110, 0.1);
+  border: 1px solid rgba(201, 169, 110, 0.15);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 11px; letter-spacing: 2px;
+  color: var(--gold); margin-bottom: 20px;
+}
+
+.brochure-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px; font-weight: 300; margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.brochure-title em { font-style: italic; color: var(--gold); }
+
+.brochure-text {
+  font-size: 14px; color: rgba(250, 248, 242, 0.6);
+  line-height: 1.8; margin-bottom: 24px;
+}
+
+.brochure-items {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin-bottom: 24px;
+}
+
+.brochure-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(201, 169, 110, 0.06);
+  font-size: 13px; color: var(--ivory);
+}
+
+.brochure-item-icon { font-size: 18px; }
+
+.brochure-date {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-style: italic;
+  color: var(--gold); opacity: 0.7;
+}
+
+/* ─── Footer ─────────────────── */
+.lobby-footer {
+  padding: 60px 40px; text-align: center;
+  border-top: 1px solid rgba(201, 169, 110, 0.06);
+}
+
+.footer-text {
+  font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+  color: rgba(250, 248, 242, 0.3);
+}
+
+.footer-crest {
+  font-size: 24px; margin-bottom: 12px; opacity: 0.4;
+}
+
+/* ─── Ambient particles ──────── */
+.particle-field {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+}
+
+.particle {
+  position: absolute; width: 2px; height: 2px;
+  background: var(--gold); border-radius: 50%;
+  opacity: 0; animation: float-up linear infinite;
+}
+
+@keyframes float-up {
+  0% { opacity: 0; transform: translateY(100vh) scale(0); }
+  10% { opacity: 0.3; }
+  90% { opacity: 0.1; }
+  100% { opacity: 0; transform: translateY(-20px) scale(1); }
+}
+</style>
+</head>
+<body>
+
+<!-- Ambient Particles -->
+<div class="particle-field" id="particles"></div>
+
+<!-- Toggle Menu -->
+<div class="toggle-menu">
+  <button class="toggle-btn" onclick="togglePanel()" id="menuBtn" title="Concierge Menu">☰</button>
+</div>
+
+<div class="toggle-panel" id="panel">
+  <div class="panel-title">Concierge</div>
+
+  <a class="panel-link" href="grok-drawer.html">
+    <span class="panel-icon">📦</span>
+    <div>
+      <div class="panel-link-label">Grok Drawer</div>
+      <div class="panel-link-sub">Asset Catalog</div>
+    </div>
+  </a>
+
+  <a class="panel-link" href="harmonograph.html">
+    <span class="panel-icon">🌀</span>
+    <div>
+      <div class="panel-link-label">Harmona Graph</div>
+      <div class="panel-link-sub">Frequency → Shape</div>
+    </div>
+  </a>
+
+  <div class="panel-divider"></div>
+
+  <a class="panel-link" onclick="runPipeline('status')">
+    <span class="panel-icon">📡</span>
+    <div>
+      <div class="panel-link-label">Pipeline Status</div>
+      <div class="panel-link-sub">Video Engine health</div>
+    </div>
+  </a>
+
+  <a class="panel-link" onclick="runPipeline('generate')">
+    <span class="panel-icon">▶</span>
+    <div>
+      <div class="panel-link-label">Quick Generate</div>
+      <div class="panel-link-sub">Launch pipeline</div>
+    </div>
+  </a>
+
+  <a class="panel-link" onclick="runPipeline('scan')">
+    <span class="panel-icon">🔍</span>
+    <div>
+      <div class="panel-link-label">Scan Library</div>
+      <div class="panel-link-sub">DIM inventory check</div>
+    </div>
+  </a>
+
+  <div class="panel-divider"></div>
+
+  <a class="panel-link" onclick="runPipeline('comfyui')">
+    <span class="panel-icon">🎨</span>
+    <div>
+      <div class="panel-link-label">ComfyUI</div>
+      <div class="panel-link-sub">Refinement engine</div>
+    </div>
+  </a>
+
+  <a class="panel-link" onclick="runPipeline('runway')">
+    <span class="panel-icon">✈</span>
+    <div>
+      <div class="panel-link-label">Runway</div>
+      <div class="panel-link-sub">Cloud video generation</div>
+    </div>
+  </a>
+
+  <div class="panel-divider"></div>
+  <div style="padding:8px 12px;font-size:10px;color:rgba(250,248,242,0.2);letter-spacing:1px">
+    PRIVATE PATH: ~/.gemini/treasury/
+  </div>
+</div>
+
+<!-- Hero: Lobby -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hotel-crest">👑</div>
+    <div class="hotel-name">TEE(n) Land</div>
+    <h1 class="hotel-title">Welcome to the <em>Hotel</em></h1>
+    <div class="hotel-subtitle">First Class Service · Always</div>
+    <div class="divider"></div>
+    <p class="hotel-tagline">
+      Every conversation begins with arrival.<br>
+      Every arrival deserves <em>first class</em>.
+    </p>
+  </div>
+</section>
+
+<!-- Services -->
+<section class="services">
+  <div class="section-label">Hotel Services</div>
+  <h2 class="section-title">First Class, Maintained Throughout</h2>
+
+  <div class="service-grid">
+    <div class="service-card">
+      <div class="service-icon">🎨</div>
+      <div class="service-name">Creative Studio</div>
+      <div class="service-desc">Daz3D → ComfyUI → Runway pipeline. Genesis 9 characters rendered and refined locally. Your art, your hardware.</div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon">🌀</div>
+      <div class="service-name">Harmona Graph</div>
+      <div class="service-desc">Frequency paints the curve. Interactive harmonograph with Linear, Epi, and Rotary pendulum modes. Math as beauty.</div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon">📦</div>
+      <div class="service-name">Grok Drawer</div>
+      <div class="service-desc">Slide-out catalog for browsing manifests, copying CLI commands, and launching pipelines. Your 16-page Daz library at a glance.</div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon">📡</div>
+      <div class="service-name">Token Velocity Matrix</div>
+      <div class="service-desc">Validator health visualization. TPS, latency, queue depth, and coherence — rendered as living harmonic shapes.</div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon">🔐</div>
+      <div class="service-name">Private Treasury</div>
+      <div class="service-desc">All exports, renders, and manifests stored privately under ~/.gemini/treasury/. Not in Public Documents. Your castle.</div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon">🧵</div>
+      <div class="service-name">THREADCROWN™</div>
+      <div class="service-desc">Wear Comfort Like Royalty. Soft-touch apparel brand positioning. From Brielle to a full product line.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Brochure: Parent Day -->
+<section class="brochure">
+  <div class="brochure-card">
+    <div class="brochure-badge">📋 LOBBY BROCHURE</div>
+
+    <h2 class="brochure-title">
+      <em>Parent Day</em><br>
+      at TEE(n) Land Hotel
+    </h2>
+
+    <p class="brochure-text">
+      Every TEE(n) Land resident has an anchor — the parents who built the foundation.
+      Parent Day honors that foundation with first-class recognition.
+      Not a transaction. Not an obligation. A celebration of the architects who poured the concrete.
+    </p>
+
+    <div class="brochure-items">
+      <div class="brochure-item">
+        <span class="brochure-item-icon">☕</span>
+        Morning coffee service
+      </div>
+      <div class="brochure-item">
+        <span class="brochure-item-icon">🧵</span>
+        THREADCROWN gift package
+      </div>
+      <div class="brochure-item">
+        <span class="brochure-item-icon">🌀</span>
+        Personal Harmona Graph print
+      </div>
+      <div class="brochure-item">
+        <span class="brochure-item-icon">👑</span>
+        Royal Oracle recognition
+      </div>
+      <div class="brochure-item">
+        <span class="brochure-item-icon">🐟</span>
+        Minnow catch ceremony
+      </div>
+      <div class="brochure-item">
+        <span class="brochure-item-icon">🎂</span>
+        Birthday celebration
+      </div>
+    </div>
+
+    <p class="brochure-date">
+      "The fortress was always built on love." — Echad
+    </p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="lobby-footer">
+  <div class="footer-crest">👑</div>
+  <div class="footer-text">
+    TEE(n) Land Hotel · First Class Service · Est. 2026 · Minnow OS
+  </div>
+</footer>
+
+<script>
+// ─── Toggle Panel ─────────────────────────────────────────────
+function togglePanel() {
+  document.getElementById('panel').classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.toggle-menu') && !e.target.closest('.toggle-panel')) {
+    document.getElementById('panel').classList.remove('open');
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('panel').classList.remove('open');
+});
+
+// ─── Pipeline Commands ────────────────────────────────────────
+function runPipeline(action) {
+  const cmds = {
+    status: 'python video_engine/video_engine.py status',
+    generate: 'python video_engine/video_engine.py generate',
+    scan: 'python video_engine/video_engine.py scan-library',
+    comfyui: 'python video_engine/daz3d_comfy_bridge.py validate',
+    runway: 'python video_engine/video_engine.py engines'
+  };
+  const cmd = cmds[action] || action;
+  navigator.clipboard.writeText(cmd);
+
+  const btn = event.target.closest('.panel-link');
+  const orig = btn.querySelector('.panel-link-sub').textContent;
+  btn.querySelector('.panel-link-sub').textContent = '✅ Copied to clipboard';
+  setTimeout(() => {
+    btn.querySelector('.panel-link-sub').textContent = orig;
+  }, 1500);
+}
+
+// ─── Ambient Particles ────────────────────────────────────────
+function createParticles() {
+  const field = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (8 + Math.random() * 15) + 's';
+    p.style.animationDelay = Math.random() * 10 + 's';
+    p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+    field.appendChild(p);
+  }
+}
+
+createParticles();
+</script>
+
+</body>
+</html>
