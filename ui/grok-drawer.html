@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grok Drawer — Daz3D Catalog</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+
+:root {
+  --bg: #050506;
+  --surface: #0d0d10;
+  --border: rgba(255,255,255,0.06);
+  --fg: #e0e0e4;
+  --fg-dim: #6b6b78;
+  --teal: #2dd4bf;
+  --gold: #f1df6f;
+  --pink: #f472b6;
+  --purple: #a78bfa;
+  --blue: #60a5fa;
+  --green: #34d399;
+  --red: #f87171;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', -apple-system, sans-serif;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── Layout ─────────────────── */
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* ─── Sidebar ────────────────── */
+.sidebar {
+  width: 280px;
+  background: rgba(0,0,0,0.4);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(20px);
+}
+
+.sidebar-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.logo-mark {
+  width: 32px; height: 32px; background: #fff; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 10px; color: #000;
+  box-shadow: 0 0 15px rgba(255,255,255,0.15);
+}
+
+.logo-text {
+  font-weight: 900; font-size: 18px; color: #fff;
+  letter-spacing: -0.5px; font-style: italic;
+}
+
+.logo-sub {
+  font-size: 9px; color: var(--fg-dim); letter-spacing: 3px;
+  text-transform: uppercase; margin-top: 4px;
+}
+
+/* ─── Node List ──────────────── */
+.node-list {
+  flex: 1; overflow-y: auto; padding: 12px;
+}
+
+.node-item {
+  padding: 14px 16px; border-radius: 14px; cursor: pointer;
+  margin-bottom: 4px; transition: all 0.15s;
+  border: 1px solid transparent;
+}
+
+.node-item:hover { background: rgba(255,255,255,0.02); }
+
+.node-item.active {
+  background: rgba(45, 212, 191, 0.06);
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.node-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.node-desc {
+  font-size: 11px; color: var(--fg-dim); margin-top: 2px;
+}
+
+.node-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block; margin-left: 6px;
+}
+
+.dot-active { background: var(--green); animation: pulse 2s infinite; }
+.dot-pending { background: var(--gold); }
+.dot-off { background: var(--fg-dim); }
+
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* ─── Main Content ───────────── */
+.main {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.main-header {
+  padding: 32px 40px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.breadcrumb {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px; border-radius: 20px;
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.15);
+  font-size: 11px; letter-spacing: 2px;
+}
+
+.breadcrumb-dot { color: var(--teal); }
+
+.main-title {
+  font-size: 42px; font-weight: 900; letter-spacing: -2px;
+  color: #fff; margin-top: 12px; line-height: 1;
+}
+
+.main-title span { color: var(--teal); }
+
+/* ─── Card Grid ──────────────── */
+.card-grid {
+  flex: 1; overflow-y: auto; padding: 32px 40px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px; align-content: start;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: rgba(45, 212, 191, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.card-status {
+  position: absolute; top: 16px; right: 16px;
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  padding: 3px 8px; border-radius: 6px;
+}
+
+.status-ready { background: rgba(52,211,153,0.15); color: var(--green); }
+.status-pending { background: rgba(241,223,111,0.15); color: var(--gold); }
+.status-cloud { background: rgba(96,165,250,0.15); color: var(--blue); }
+
+.card-figure {
+  font-size: 9px; color: var(--fg-dim); letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+
+.card-name {
+  font-size: 20px; font-weight: 700; color: #fff;
+  margin-bottom: 4px;
+}
+
+.card-theme {
+  font-size: 12px; color: var(--fg-dim); margin-bottom: 12px;
+}
+
+.card-tags {
+  display: flex; flex-wrap: wrap; gap: 4px;
+}
+
+.tag {
+  font-size: 9px; padding: 3px 8px; border-radius: 4px;
+  background: rgba(255,255,255,0.04); color: var(--fg-dim);
+  letter-spacing: 0.5px;
+}
+
+/* ─── Drawer ─────────────────── */
+.drawer-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 100; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+.drawer {
+  position: fixed; top: 0; right: -480px; bottom: 0; width: 480px;
+  background: var(--surface); border-left: 1px solid var(--border);
+  z-index: 101; transition: right 0.3s ease;
+  display: flex; flex-direction: column;
+  backdrop-filter: blur(20px);
+}
+
+.drawer.open { right: 0; }
+
+.drawer-header {
+  padding: 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.drawer-close {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  color: var(--fg-dim); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.drawer-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+.drawer-body {
+  flex: 1; overflow-y: auto; padding: 24px;
+}
+
+.drawer-section {
+  margin-bottom: 24px;
+}
+
+.drawer-section-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--teal); margin-bottom: 10px;
+}
+
+.drawer-field {
+  display: flex; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.drawer-field-label { color: var(--fg-dim); }
+.drawer-field-value { color: #fff; font-weight: 500; }
+
+.drawer-prompt {
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px; font-size: 12px;
+  color: var(--fg); line-height: 1.5; margin-top: 8px;
+  font-family: 'Inter', sans-serif;
+}
+
+.drawer-actions {
+  padding: 20px 24px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+}
+
+.btn-primary {
+  flex: 1; padding: 14px; border-radius: 14px; border: none;
+  background: #fff; color: #000; font-weight: 700; font-size: 13px;
+  cursor: pointer; transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-primary:hover { background: var(--teal); }
+
+.btn-secondary {
+  flex: 1; padding: 14px; border-radius: 14px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--fg); font-weight: 600; font-size: 13px;
+  cursor: pointer; transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-secondary:hover { background: rgba(255,255,255,0.05); }
+
+/* ─── Scanline ───────────────── */
+.scanline {
+  position: fixed; inset: 0; pointer-events: none; z-index: 200;
+  background: linear-gradient(transparent 50%, rgba(255,0,0,0.02) 50%);
+  background-size: 100% 4px;
+}
+
+/* ─── Scrollbar ──────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-mark">H&R</div>
+        <div>
+          <div class="logo-text">PRO_GARDEN</div>
+          <div class="logo-sub">Trappist TEE9 Array</div>
+        </div>
+      </div>
+    </div>
+    <div class="node-list" id="nodeList"></div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="main-header">
+      <div class="breadcrumb">
+        <span class="breadcrumb-dot">●</span>
+        GROK DRAWER — ASSET CATALOG
+      </div>
+      <h1 class="main-title">DAZ3D CATALOG<br><span>GENESIS 9 PIPELINE</span></h1>
+    </div>
+
+    <div class="card-grid" id="cardGrid"></div>
+  </div>
+</div>
+
+<!-- Drawer Overlay -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- Detail Drawer -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div>
+      <div style="font-size:10px;color:var(--teal);letter-spacing:2px;font-weight:700" id="drawerFigure">GENESIS 9 FEMALE</div>
+      <div style="font-size:20px;font-weight:700;color:#fff;margin-top:4px" id="drawerName">Medicine Singer</div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-actions">
+    <button class="btn-primary" onclick="copyCommand()">COPY CLI COMMAND</button>
+    <button class="btn-secondary" onclick="copyPrompt()">COPY PROMPT</button>
+  </div>
+</div>
+
+<script>
+// ─── Catalog Data ─────────────────────────────────────────────
+
+const CATALOG = [
+  {
+    name: 'Medicine Singer',
+    figure: 'Genesis 9 Female',
+    theme: 'Teal-gold imperial armor + bio-silk organza',
+    status: 'ready',
+    manifest: true,
+    tags: ['armor', 'veils', 'wolf', 'Han Dynasty', 'golden hour'],
+    node: 'MEDICINE_SINGER',
+    outfit: 'Teal-gold armor + bio-silk organza veils',
+    environment: 'Spindle Torus + Han Dynasty accents',
+    lighting: 'Soft golden hour ambient + rim light',
+    companion: 'Wolf (protective)',
+    render: '1920×1080 · 48 frames · PNG',
+    prompt: 'Genesis 9 Female as Medicine Singer, teal-and-gold imperial armor with flowing bio-silk organza veils in teal and gold, Han Dynasty accents, graceful pose with wolf companion at her side, Spindle Torus background, soft golden ambient lighting, cinematic composition, highly detailed, ethereal atmosphere',
+    cli: 'python video_engine/daz3d_comfy_bridge.py export Medicine_Singer --frames 48',
+    variants: ['Red Spark', 'Golden Rest', 'Battle Stance']
+  },
+  {
+    name: 'Amala',
+    figure: 'Genesis 9 Female',
+    theme: 'Character base — awaiting manifest',
+    status: 'pending',
+    manifest: false,
+    tags: ['base character', 'Gen9'],
+    node: 'AMALA',
+    outfit: 'G9 Base clothing',
+    environment: 'TBD',
+    lighting: 'TBD',
+    render: '1920×1080 · 48 frames · PNG',
+    prompt: '',
+    cli: 'python video_engine/video_engine.py create-manifest',
+    variants: []
+  },
+  {
+    name: 'Kat',
+    figure: 'Genesis 9 Female',
+    theme: 'Character base — awaiting manifest',
+    status: 'pending',
+    manifest: false,
+    tags: ['base character', 'Gen9'],
+    node: 'KAT',
+    outfit: 'G9 Base clothing',
+    environment: 'TBD',
+    lighting: 'TBD',
+    render: '1920×1080 · 48 frames · PNG',
+    prompt: '',
+    cli: 'python video_engine/video_engine.py create-manifest',
+    variants: []
+  },
+  {
+    name: 'Laura',
+    figure: 'Genesis 9 Female',
+    theme: 'Character base — beach/motion pipeline',
+    status: 'pending',
+    manifest: false,
+    tags: ['base character', 'Gen9', 'beach', 'motion'],
+    node: 'LAURA',
+    outfit: 'G9 Base Bikini',
+    environment: 'Beach / Resort',
+    lighting: 'Natural daylight',
+    render: '1920×1080 · 48 frames · PNG',
+    prompt: '',
+    cli: 'python video_engine/video_engine.py create-manifest',
+    variants: []
+  },
+  {
+    name: 'Bardot',
+    figure: 'Genesis 8 Female',
+    theme: 'Outfit set — skirt, top, sandals',
+    status: 'ready',
+    manifest: false,
+    tags: ['outfit', 'Gen8F', 'casual', 'sandals'],
+    node: 'BARDOT',
+    outfit: 'Top + Skirt + Sandals + FootPose',
+    environment: 'Any',
+    lighting: 'Any',
+    render: '1920×1080 · 24 frames · PNG',
+    prompt: 'Genesis 8 Female wearing Bardot outfit, elegant skirt and top, sandals, natural setting',
+    cli: 'python video_engine/daz3d_comfy_bridge.py export Bardot --frames 24',
+    variants: []
+  },
+  {
+    name: 'Piratess',
+    figure: 'Genesis 1 + Gen 2 Female',
+    theme: 'Legacy outfit set — full pirate look',
+    status: 'ready',
+    manifest: false,
+    tags: ['legacy', 'pirate', 'costume', 'props'],
+    node: 'PIRATESS',
+    outfit: 'Full pirate outfit + hair + props',
+    environment: 'Ship / Ocean',
+    lighting: 'Dramatic stormy',
+    render: '1920×1080 · 24 frames · PNG',
+    prompt: 'Female pirate in full Piratess outfit, dramatic ocean backdrop, stormy lighting',
+    cli: 'python video_engine/daz3d_comfy_bridge.py export Piratess --frames 24',
+    variants: []
+  }
+];
+
+const NODES = [
+  { name: 'GROK DRAWER', desc: 'Asset Catalog', color: 'var(--teal)', active: true },
+  { name: 'VIDEO ENGINE', desc: 'Daz → ComfyUI → Render', color: 'var(--blue)', active: true },
+  { name: 'MEDICINE SINGER', desc: 'Genesis 9 Female Manifest', color: 'var(--teal)', active: true },
+  { name: 'WOMB SHIP', desc: 'Guardian Archetype Layer', color: 'var(--pink)', active: false },
+  { name: 'SIREN CHOIR', desc: 'Feminine Creative Current', color: 'var(--purple)', active: false },
+  { name: 'HARMONA GRAPH', desc: 'Frequency → Shape', color: 'var(--gold)', active: true },
+  { name: 'TVM RANKER', desc: 'Token Velocity Matrix', color: 'var(--green)', active: true },
+];
+
+// ─── Render ───────────────────────────────────────────────────
+
+function renderNodes() {
+  const list = document.getElementById('nodeList');
+  list.innerHTML = NODES.map((n, i) => `
+    <div class="node-item ${i === 0 ? 'active' : ''}" onclick="selectNode(${i})">
+      <div>
+        <span class="node-label" style="color:${n.color}">${n.name}</span>
+        <span class="node-dot ${n.active ? 'dot-active' : 'dot-off'}"></span>
+        <div class="node-desc">${n.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderCards() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = CATALOG.map((c, i) => `
+    <div class="card" onclick="openDrawer(${i})">
+      <div class="card-status ${c.status === 'ready' ? 'status-ready' : 'status-pending'}">
+        ${c.status === 'ready' ? '● MANIFEST' : '○ PENDING'}
+      </div>
+      <div class="card-figure">${c.figure}</div>
+      <div class="card-name">${c.name}</div>
+      <div class="card-theme">${c.theme}</div>
+      <div class="card-tags">
+        ${c.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+let currentItem = null;
+
+function openDrawer(idx) {
+  currentItem = CATALOG[idx];
+  document.getElementById('drawerFigure').textContent = currentItem.figure.toUpperCase();
+  document.getElementById('drawerName').textContent = currentItem.name;
+
+  const body = document.getElementById('drawerBody');
+  body.innerHTML = `
+    <div class="drawer-section">
+      <div class="drawer-section-title">Identity</div>
+      <div class="drawer-field"><span class="drawer-field-label">Node</span><span class="drawer-field-value">${currentItem.node}</span></div>
+      <div class="drawer-field"><span class="drawer-field-label">Figure</span><span class="drawer-field-value">${currentItem.figure}</span></div>
+      <div class="drawer-field"><span class="drawer-field-label">Status</span><span class="drawer-field-value">${currentItem.manifest ? '✅ Manifest Created' : '○ Awaiting Manifest'}</span></div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">Scene</div>
+      <div class="drawer-field"><span class="drawer-field-label">Outfit</span><span class="drawer-field-value">${currentItem.outfit}</span></div>
+      <div class="drawer-field"><span class="drawer-field-label">Environment</span><span class="drawer-field-value">${currentItem.environment}</span></div>
+      <div class="drawer-field"><span class="drawer-field-label">Lighting</span><span class="drawer-field-value">${currentItem.lighting || 'TBD'}</span></div>
+      ${currentItem.companion ? `<div class="drawer-field"><span class="drawer-field-label">Companion</span><span class="drawer-field-value">${currentItem.companion}</span></div>` : ''}
+      <div class="drawer-field"><span class="drawer-field-label">Render</span><span class="drawer-field-value">${currentItem.render}</span></div>
+    </div>
+    ${currentItem.prompt ? `
+    <div class="drawer-section">
+      <div class="drawer-section-title">Generation Prompt</div>
+      <div class="drawer-prompt">${currentItem.prompt}</div>
+    </div>` : ''}
+    ${currentItem.variants.length ? `
+    <div class="drawer-section">
+      <div class="drawer-section-title">Variants</div>
+      ${currentItem.variants.map(v => `<div class="drawer-field"><span class="drawer-field-label">↳</span><span class="drawer-field-value">${v}</span></div>`).join('')}
+    </div>` : ''}
+    <div class="drawer-section">
+      <div class="drawer-section-title">CLI Command</div>
+      <div class="drawer-prompt" id="cliCmd">${currentItem.cli}</div>
+    </div>
+  `;
+
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+function selectNode(i) {
+  document.querySelectorAll('.node-item').forEach((n, j) => n.classList.toggle('active', j === i));
+}
+
+function copyCommand() {
+  if (currentItem) navigator.clipboard.writeText(currentItem.cli);
+}
+
+function copyPrompt() {
+  if (currentItem && currentItem.prompt) navigator.clipboard.writeText(currentItem.prompt);
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+// Init
+renderNodes();
+renderCards();
+</script>
+
+</body>
+</html>
