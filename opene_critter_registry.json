@@ -1,0 +1,74 @@
+{
+  "opene_version": "0.1.0-draft",
+  "registry_metadata": {
+    "name": "OPenE_Global_Critter_Registry",
+    "discovery_date": "2026-07-05",
+    "compiler": "Google Antigravity Agentic IDE",
+    "description": "Federated index of legacy High Fidelity / Vircadia assets mapped to the OPenE container format."
+  },
+  "data_sources": {
+    "echads": {
+      "status": "active",
+      "public_repos": 26,
+      "tracked_assets": [
+        "hifi-critter-framework",
+        "vircadia-content",
+        "tivolicloud-things",
+        "AzureBot",
+        "AzureIotHub"
+      ]
+    },
+    "communityus-llc": {
+      "status": "active",
+      "public_repos": 6,
+      "tracked_assets": [
+        "Reoiz",
+        "JudasHIFI",
+        "Hifi Scripts",
+        "Ass",
+        "Architecture And Assets",
+        "AetherIsland"
+      ]
+    },
+    "v2969flow": {
+      "status": "403_Forbidden",
+      "public_repos": 0,
+      "notes": "Private framework. Requires elevated sovereign ledger clearance to access."
+    }
+  },
+  "compiled_manifests": [
+    {
+      "critter_id": "critter_base_01",
+      "origin": "echads/hifi-critter-framework",
+      "opene_container": "critter_base.opene",
+      "semantic_rig": "Vircadia_Quadruped_Rig",
+      "pipeline_logic": "critter_brain.js"
+    },
+    {
+      "critter_id": "aether_island_fauna",
+      "origin": "communityus-llc/AetherIsland",
+      "dependencies": [
+        "communityus-llc/Architecture And Assets",
+        "communityus-llc/Hifi Scripts"
+      ],
+      "opene_container": "aether_fauna.opene",
+      "semantic_rig": "Universal_Avian_Rig",
+      "pipeline_logic": "aether_wander_state.js"
+    },
+    {
+      "critter_id": "judas_hifi_npc",
+      "origin": "communityus-llc/JudasHIFI",
+      "dependencies": [
+        "echads/AzureBot"
+      ],
+      "opene_container": "judas_npc_entity.opene",
+      "semantic_rig": "MetaHuman_to_Vircadia_Humanoid",
+      "pipeline_logic": "azure_bot_bridge.py"
+    }
+  ],
+  "automation_graph": {
+    "ingestion_protocol": "antigravity.ini",
+    "auto_package": true,
+    "target_environments": ["Godot", "OpenMW", "Web3"]
+  }
+}

@@ -25,6 +25,7 @@
 ; v1.8.0  2026-07-05  Medicine Singer manifest + ComfyUI workflow
 ; v1.9.0  2026-07-05  Grok Drawer — catalog skill + interactive UI
 ; v2.0.0  2026-07-05  TEE(n) Land Hotel — lobby + concierge + treasury
+; v2.1.0  2026-07-05  GORCHAIN Lattice V4.2 + OPenE Critter Registry + CCR
 ;
 ; GitLab Repos (v2969flow — private, member since Sep 10 2025):
 ;   - poop-stick-sanitizer    (this repo — dual-pushed)
@@ -164,6 +165,10 @@ Name: "{group}\TEE(n) Land Hotel";        Filename: "{app}\ui\hotel.html"; Comme
 Name: "{group}\Grok Drawer";              Filename: "{app}\ui\grok-drawer.html"; Comment: "Open Asset Catalog"
 Name: "{group}\Harmona Graph";            Filename: "{app}\ui\harmonograph.html"; Comment: "Open Harmonograph"
 Name: "{group}\PRO_GARDEN Console";       Filename: "{app}\ui\pro_garden.html"; Comment: "Open PRO_GARDEN // Trappist TEE9 Array"
+
+; ─── GORCHAIN + OPenE Critter Registry (v2.1.0) ──────────────
+Source: "critter_registry.ini";           DestDir: "{app}"; Flags: ignoreversion
+Source: "opene_critter_registry.json";    DestDir: "{app}"; Flags: ignoreversion
 Name: "{group}\Start Server (Port 8080)"; Filename: "{app}\serve.bat"; Comment: "Launch local HUD server"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName}";     Filename: "{app}\{#MyAppExe}"; Tasks: desktopicon
