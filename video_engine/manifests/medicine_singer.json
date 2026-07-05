@@ -1,0 +1,91 @@
+{
+  "manifest_version": "2.0",
+  "node": "MEDICINE_SINGER",
+  "created": "2026-07-05",
+  "base_figure": "Genesis 9 Female",
+  "theme": "Teal-Gold Imperial Armor + Bio-Silk Organza",
+
+  "character": {
+    "name": "Medicine Singer",
+    "figure": "Genesis 9 Female",
+    "morphs": ["Medicine Singer"],
+    "skin": "default",
+    "hair": "flowing_long",
+    "notes": "Guardian archetype — healer energy, Tai Chi flow"
+  },
+
+  "outfit": {
+    "armor": "teal-gold imperial armor",
+    "veils": "bio-silk organza veils (teal + gold)",
+    "accents": "Han Dynasty imperial motifs",
+    "footwear": "bare or ceremonial sandals"
+  },
+
+  "companion": {
+    "type": "wolf",
+    "behavior": "protective, positioned at side",
+    "fur": "silver-grey"
+  },
+
+  "environment": {
+    "background": "Spindle Torus",
+    "architecture": "Han Dynasty imperial accents",
+    "atmosphere": "ethereal mist, volumetric fog"
+  },
+
+  "lighting": {
+    "primary": "soft golden hour ambient",
+    "secondary": "subtle rim lighting on veils",
+    "mood": "warm, divine, cinematic"
+  },
+
+  "camera": {
+    "lens": "35mm cinematic",
+    "angle": "slight Dutch angle",
+    "framing": "full body with environment"
+  },
+
+  "render": {
+    "resolution": [1920, 1080],
+    "frames": 48,
+    "fps": 24,
+    "format": "PNG",
+    "quality": "high",
+    "antialiasing": true,
+    "output_dir": "treasury/daz3d_exports/Medicine_Singer"
+  },
+
+  "prompts": {
+    "still": "Genesis 9 Female as Medicine Singer, teal-and-gold imperial armor with flowing bio-silk organza veils in teal and gold, Han Dynasty accents, graceful pose with wolf companion at her side, Spindle Torus background, soft golden ambient lighting, cinematic composition, highly detailed, ethereal atmosphere",
+    "motion": "Short cinematic of Medicine Singer in teal-and-gold armor and bio-silk veils, gentle Tai Chi breath movement, fabric flowing in soft breeze, wolf companion moving protectively, Spindle Torus and Han Dynasty elements in background, golden hour lighting, fluid graceful motion, 24fps",
+    "runway": "Image-to-video: Medicine Singer in teal gold armor bio-silk veils, gentle Tai Chi flow, wolf companion, Spindle Torus background, golden lighting, smooth cinematic motion",
+    "kling": "Cinematic short: teal-and-gold armored Medicine Singer performing Tai Chi, flowing bio-silk veils, wolf at side, Han Dynasty Spindle Torus environment, golden hour, graceful movement",
+    "comfyui_refine": "ethereal golden hour lighting, teal and gold armor, flowing silk veils, cinematic quality, highly detailed skin texture, volumetric atmosphere"
+  },
+
+  "pipeline": {
+    "step_1": "Daz Studio 6 → Render 48-frame PNG sequence",
+    "step_2": "ComfyUI → img2img refinement with style prompt",
+    "step_3": "Runway Gen-4 or CogVideo → animate sequence",
+    "step_4": "FFmpeg → composite final .mp4",
+    "output": "treasury/video_output/Medicine_Singer.mp4"
+  },
+
+  "variants": [
+    {
+      "name": "Red_Spark",
+      "override_veils": "crimson + gold organza",
+      "override_lighting": "warm ember tones, fire rim light"
+    },
+    {
+      "name": "Golden_Rest",
+      "override_pose": "seated meditation, wolf lying beside",
+      "override_lighting": "deep golden hour, long shadows"
+    },
+    {
+      "name": "Battle_Stance",
+      "override_pose": "dynamic warrior stance, veils mid-flow",
+      "override_companion": "wolf alert, ears forward"
+    }
+  ]
+}

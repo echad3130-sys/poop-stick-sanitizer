@@ -1,0 +1,109 @@
+{
+  "last_workflow_version": "1",
+  "prompt": {
+    "1": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "Medicine_Singer_frame_0001.png",
+        "upload": "image"
+      }
+    },
+    "2": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "Medicine_Singer_frame_batch",
+        "upload": "image"
+      }
+    },
+    "3": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "ethereal golden hour lighting, teal and gold armor, flowing silk veils, cinematic quality, highly detailed skin texture, volumetric atmosphere, Han Dynasty architectural accents, Spindle Torus background, masterpiece, best quality, 8k",
+        "clip": ["10", 0]
+      }
+    },
+    "4": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "blurry, low quality, deformed, disfigured, watermark, text, oversaturated, cartoon, anime, 3d render artifacts, plastic skin",
+        "clip": ["10", 0]
+      }
+    },
+    "5": {
+      "class_type": "KSampler",
+      "inputs": {
+        "model": ["10", 0],
+        "positive": ["3", 0],
+        "negative": ["4", 0],
+        "latent_image": ["7", 0],
+        "seed": 42,
+        "steps": 30,
+        "cfg": 7.5,
+        "sampler_name": "dpmpp_2m_sde",
+        "scheduler": "karras",
+        "denoise": 0.45
+      }
+    },
+    "6": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": ["5", 0],
+        "vae": ["10", 2]
+      }
+    },
+    "7": {
+      "class_type": "VAEEncode",
+      "inputs": {
+        "pixels": ["1", 0],
+        "vae": ["10", 2]
+      }
+    },
+    "8": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": ["6", 0],
+        "filename_prefix": "MedicineSinger_refined"
+      }
+    },
+    "9": {
+      "class_type": "ImageUpscaleWithModel",
+      "_comment": "Optional 2x upscale — connect after VAEDecode if needed",
+      "inputs": {
+        "upscale_model": ["11", 0],
+        "image": ["6", 0]
+      }
+    },
+    "10": {
+      "class_type": "CheckpointLoaderSimple",
+      "inputs": {
+        "ckpt_name": "sd_xl_base_1.0.safetensors"
+      },
+      "_note": "Replace with your preferred SDXL checkpoint"
+    },
+    "11": {
+      "class_type": "UpscaleModelLoader",
+      "inputs": {
+        "model_name": "RealESRGAN_x2plus.pth"
+      },
+      "_note": "Optional upscaler — install RealESRGAN model"
+    }
+  },
+  "_metadata": {
+    "manifest": "medicine_singer.json",
+    "pipeline_step": "step_2_comfyui_refinement",
+    "denoise_guide": {
+      "0.30": "Subtle cleanup — preserves Daz render closely",
+      "0.45": "Balanced refinement — adds photorealism (RECOMMENDED)",
+      "0.65": "Heavy restyle — significant artistic deviation",
+      "0.80": "Near full regeneration — only composition preserved"
+    },
+    "instructions": [
+      "1. Place Daz3D PNG exports in ComfyUI/input/ directory",
+      "2. Load this workflow in ComfyUI",
+      "3. Adjust denoise (0.30-0.65) based on desired refinement level",
+      "4. For batch: use LoadImageBatch node instead of LoadImage",
+      "5. Output goes to ComfyUI/output/MedicineSinger_refined_*",
+      "6. Feed refined frames to Runway/CogVideo for animation"
+    ]
+  }
+}
