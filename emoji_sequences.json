@@ -1,0 +1,123 @@
+{
+  "version": "1.0",
+  "updated": "2026-07-09T06:12:00Z",
+  "description": "Emoji action sequences for the TEE9 Lattice orchestrator. Each sequence maps to a specific system action.",
+
+  "sequences": {
+    "🐛🐟": {
+      "name": "TDS Probe",
+      "desc": "Probe domain for Cloudflare fingerprint + redirect chain",
+      "action": "probe_tds",
+      "target": "ui/tds_probe.html",
+      "port": null
+    },
+    "🐛🛡🐟": {
+      "name": "HITM Forensic Re-Ingest",
+      "desc": "Re-scan blocked domains for mutation tracking",
+      "action": "forensic_ingest",
+      "target": "ui/tds_probe.html",
+      "port": null
+    },
+    "🐟🎞📺": {
+      "name": "Meta Video Render Ingest",
+      "desc": "Ingest Meta AI share into video pipeline",
+      "action": "meta_ingest",
+      "target": "video_engine/",
+      "port": 8787
+    },
+    "🥜📺🖤": {
+      "name": "Chloe Sanctuary Signal",
+      "desc": "YouTube anchor — Chloe_IRLL stream watch",
+      "action": "chloe_signal",
+      "target": "https://www.youtube.com/@Chloe_IRLL",
+      "port": null
+    },
+    "🐛🔄": {
+      "name": "Reboot Command Hub",
+      "desc": "Restart :8787 Light Deck via Kenya Coffee",
+      "action": "reboot_hub",
+      "target": "localhost:8787",
+      "port": 8787
+    },
+    "☕🔍": {
+      "name": "Kenya Coffee Sweep",
+      "desc": "Health check all 4 ports — boot any that are down",
+      "action": "kenya_sweep",
+      "target": "all_ports",
+      "port": null
+    },
+    "🧱🔐": {
+      "name": "Vault Seal",
+      "desc": "Lock treasury + clear browser cookies for affected domains",
+      "action": "vault_seal",
+      "target": "~/.gemini/treasury/",
+      "port": null
+    },
+    "🐛🍟🍟": {
+      "name": "Belgian Frites Mode",
+      "desc": "Fun mode — emoji storytelling pipeline for stream chat",
+      "action": "frites_mode",
+      "target": null,
+      "port": null
+    },
+    "🔣👇🎵": {
+      "name": "System of a Down",
+      "desc": "Music queue — band emoji decode sequence",
+      "action": "music_queue",
+      "target": null,
+      "port": null
+    },
+    "🕵♀🏁": {
+      "name": "Detective Sign-Off",
+      "desc": "End session — archive logs + push telemetry",
+      "action": "detective_out",
+      "target": "audit_queue.log",
+      "port": null
+    },
+    "🎒📺🎞": {
+      "name": "Backpack Drip Stream",
+      "desc": "ComfyUI 1080 Ti live render pipeline → ambient revenue stream",
+      "action": "drip_stream",
+      "target": "video_engine/",
+      "port": 8000
+    },
+
+    "🧼💩🖥": {
+      "name": "Sanitizer Deck",
+      "desc": "Scrub fiat contamination — opens quarantine_deck.html from poop-stick-sanitizer root",
+      "action": "start_process",
+      "target": "ui/quarantine_deck.html",
+      "port": null,
+      "lore": "Direct map to poop-stick-sanitizer. Scrub / Contaminant / Terminal."
+    },
+    "🧊🛑🖥": {
+      "name": "Quarantine Hold",
+      "desc": "Freeze egress, stop bad payload, open QA Audit Queue UI",
+      "action": "start_process",
+      "target": "ui/quarantine_deck.html",
+      "port": null,
+      "lore": "Freeze / Stop / Terminal. The exact function of the QA Audit Queue."
+    },
+    "☣️🕷🖥": {
+      "name": "Spy'Dir'E Cell",
+      "desc": "Biohazard caught on golden log — open holding cell via Aetheria's thin thread",
+      "action": "start_process",
+      "target": "ui/quarantine_deck.html",
+      "port": null,
+      "lore": "Biohazard / Spy'Dir / Terminal. TEE(n) Land Hotel lobby lore — Aetheria's thread caught it."
+    }
+  },
+
+  "quarantine_vectors": ["🧼💩🖥", "🧊🛑🖥", "☣️🕷🖥"],
+
+  "port_map": {
+    "5001": "KoboldCPP (Qwen/DeepSeek)",
+    "8000": "Skill Creator (FastAPI)",
+    "8787": "Command Hub (Light Deck)",
+    "8080": "Antigravity Exchange"
+  },
+
+  "archive_spine_count": 44,
+  "classifier": "localhost:5001",
+  "classifier_labels": ["_S", "_$", "BLOCKED"]
+}

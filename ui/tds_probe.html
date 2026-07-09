@@ -279,6 +279,30 @@ const ACTIONS = [
     name: 'Detective Sign-Off',
     desc: 'End session — archive logs + push telemetry',
     action: () => detectiveOut()
+  },
+  {
+    emoji: '🎒📺🎞',
+    name: 'Backpack Drip Stream',
+    desc: 'ComfyUI 1080 Ti live render → ambient revenue stream',
+    action: () => { log('🎒📺🎞 Drip stream armed — 1080 Ti render pipeline active', 'ok'); }
+  },
+  {
+    emoji: '🧼💩🖥',
+    name: 'Sanitizer Deck',
+    desc: 'Scrub _$ fiat contamination — quarantine_deck.html',
+    action: () => { log('🧼💩🖥 Opening Sanitizer Deck — scrubbing contaminants...', 'info'); window.open('quarantine_deck.html', '_blank'); }
+  },
+  {
+    emoji: '🧊🛑🖥',
+    name: 'Quarantine Hold',
+    desc: 'Freeze egress, stop bad payload, open QA Audit Queue',
+    action: () => { log('🧊🛑🖥 Quarantine Hold — egress FROZEN, payloads STOPPED', 'warn'); window.open('quarantine_deck.html', '_blank'); }
+  },
+  {
+    emoji: '☣️🕷🖥',
+    name: "Spy'Dir'E Cell",
+    desc: "Biohazard on golden log — Aetheria's thread caught it",
+    action: () => { log("☣️🕷🖥 Spy'Dir'E Cell opened — biohazard contained", 'err'); window.open('quarantine_deck.html', '_blank'); }
   }
 ];
 
