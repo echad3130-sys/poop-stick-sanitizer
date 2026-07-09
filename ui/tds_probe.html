@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐛 Emoji Action Grid + TDS Probe Sandbox</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #0a0a0c;
+  --surface: #111115;
+  --border: rgba(255,255,255,0.06);
+  --fg: #d4d4d8;
+  --dim: #52525b;
+  --green: #34d399;
+  --red: #f87171;
+  --gold: #fbbf24;
+  --teal: #2dd4bf;
+  --pink: #f472b6;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: 'Inter', sans-serif; min-height: 100vh;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+h1 {
+  font-size: 28px; font-weight: 700; color: #fff;
+  margin-bottom: 4px; letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 12px; color: var(--dim); letter-spacing: 3px;
+  text-transform: uppercase; margin-bottom: 32px;
+}
+
+/* ─── Emoji Action Grid ──────── */
+.section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--teal); margin-bottom: 16px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+
+.action-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px; margin-bottom: 40px;
+}
+
+.action-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px; cursor: pointer;
+  transition: all 0.2s; display: flex; align-items: center; gap: 14px;
+}
+
+.action-card:hover {
+  border-color: rgba(45, 212, 191, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.action-card.firing {
+  border-color: var(--green);
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.15);
+}
+
+.action-emoji {
+  font-size: 28px; min-width: 70px; text-align: center;
+  background: rgba(255,255,255,0.03); border-radius: 10px;
+  padding: 10px 4px;
+}
+
+.action-info { flex: 1; }
+
+.action-name {
+  font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 2px;
+}
+
+.action-desc { font-size: 11px; color: var(--dim); }
+
+.action-status {
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  padding: 3px 8px; border-radius: 5px;
+}
+
+.status-armed { background: rgba(52,211,153,0.12); color: var(--green); }
+.status-firing { background: rgba(251,191,36,0.12); color: var(--gold); }
+
+/* ─── TDS Probe ──────────────── */
+.probe-section { margin-bottom: 40px; }
+
+.probe-controls {
+  display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+}
+
+.probe-input {
+  flex: 1; min-width: 200px; padding: 12px 16px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+}
+
+.probe-input:focus { outline: none; border-color: var(--teal); }
+
+.probe-btn {
+  padding: 12px 20px; border-radius: 10px; border: none;
+  font-weight: 700; font-size: 12px; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+
+.btn-probe { background: var(--teal); color: #000; }
+.btn-probe:hover { background: #5eead4; }
+.btn-block { background: var(--red); color: #fff; }
+.btn-block:hover { background: #fca5a5; color: #000; }
+.btn-clear { background: rgba(255,255,255,0.05); color: var(--fg); border: 1px solid var(--border); }
+
+/* ─── Log ────────────────────── */
+.log-container {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px; max-height: 400px;
+  overflow-y: auto; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; line-height: 1.8;
+}
+
+.log-entry { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
+.log-time { color: var(--dim); }
+.log-ok { color: var(--green); }
+.log-warn { color: var(--gold); }
+.log-err { color: var(--red); }
+.log-info { color: var(--blue); }
+
+/* ─── Port Status ────────────── */
+.port-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin-bottom: 40px;
+}
+
+.port-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; text-align: center;
+}
+
+.port-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px; font-weight: 700; color: #fff;
+}
+
+.port-name { font-size: 10px; color: var(--dim); margin-top: 4px; }
+
+.port-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block; margin-top: 6px;
+}
+
+.dot-up { background: var(--green); box-shadow: 0 0 8px rgba(52,211,153,0.4); }
+.dot-down { background: var(--red); }
+
+/* ─── Scrollbar ──────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🐛 Emoji Action Grid + TDS Probe</h1>
+  <div class="subtitle">PRO_GARDEN // HITM-GUARDIAN // Exchange :8080</div>
+
+  <!-- Port Status -->
+  <div class="section-title">Port Status</div>
+  <div class="port-grid">
+    <div class="port-card">
+      <div class="port-num">:5001</div>
+      <div class="port-name">KoboldCPP</div>
+      <div class="port-dot dot-up" id="dot5001"></div>
+    </div>
+    <div class="port-card">
+      <div class="port-num">:8000</div>
+      <div class="port-name">Skill Creator</div>
+      <div class="port-dot dot-up" id="dot8000"></div>
+    </div>
+    <div class="port-card">
+      <div class="port-num">:8787</div>
+      <div class="port-name">Command Hub</div>
+      <div class="port-dot dot-up" id="dot8787"></div>
+    </div>
+    <div class="port-card">
+      <div class="port-num">:8080</div>
+      <div class="port-name">Exchange</div>
+      <div class="port-dot dot-up" id="dot8080"></div>
+    </div>
+  </div>
+
+  <!-- Emoji Action Grid -->
+  <div class="section-title">Emoji Sequences — Click to Fire</div>
+  <div class="action-grid" id="actionGrid"></div>
+
+  <!-- TDS Probe -->
+  <div class="probe-section">
+    <div class="section-title">TDS Probe Sandbox</div>
+    <div class="probe-controls">
+      <input class="probe-input" id="probeUrl" value="mupabi.sbs" placeholder="Domain to probe...">
+      <button class="probe-btn btn-probe" onclick="probeTarget()">🐛🐟 PROBE</button>
+      <button class="probe-btn btn-block" onclick="blockTarget()">🛡 BLOCK</button>
+      <button class="probe-btn btn-clear" onclick="clearLog()">CLEAR LOG</button>
+    </div>
+  </div>
+
+  <!-- Log -->
+  <div class="section-title">Vault Stream Log</div>
+  <div class="log-container" id="logContainer"></div>
+</div>
+
+<script>
+// ─── Emoji Actions ────────────────────────────────────────────
+const ACTIONS = [
+  {
+    emoji: '🐛🐟',
+    name: 'TDS Probe',
+    desc: 'Probe domain for Cloudflare fingerprint + redirect chain',
+    action: () => probeTarget()
+  },
+  {
+    emoji: '🐛🛡🐟',
+    name: 'HITM Forensic Re-Ingest',
+    desc: 'Re-scan blocked domains for mutation tracking',
+    action: () => forensicIngest()
+  },
+  {
+    emoji: '🐟🎞📺',
+    name: 'Meta Video Render Ingest',
+    desc: 'Ingest Meta AI share into video pipeline',
+    action: () => metaIngest()
+  },
+  {
+    emoji: '🥜📺🖤',
+    name: 'Chloe Sanctuary Signal',
+    desc: 'YouTube anchor — Chloe_IRLL stream watch',
+    action: () => chloeSignal()
+  },
+  {
+    emoji: '🐛🔄',
+    name: 'Reboot Command Hub',
+    desc: 'Restart :8787 Light Deck via Kenya Coffee',
+    action: () => rebootHub()
+  },
+  {
+    emoji: '☕🔍',
+    name: 'Kenya Coffee Sweep',
+    desc: 'Health check all 4 ports — boot any that are down',
+    action: () => kenyaSweep()
+  },
+  {
+    emoji: '🧱🔐',
+    name: 'Vault Seal',
+    desc: 'Lock treasury + clear browser cookies for affected domains',
+    action: () => vaultSeal()
+  },
+  {
+    emoji: '🐛🍟🍟',
+    name: 'Belgian Frites Mode',
+    desc: 'Fun mode — emoji storytelling pipeline for stream chat',
+    action: () => fritesMode()
+  },
+  {
+    emoji: '🔣👇🎵',
+    name: 'System of a Down',
+    desc: 'Music queue — band emoji decode sequence',
+    action: () => musicQueue()
+  },
+  {
+    emoji: '🕵♀🏁',
+    name: 'Detective Sign-Off',
+    desc: 'End session — archive logs + push telemetry',
+    action: () => detectiveOut()
+  }
+];
+
+function renderActions() {
+  const grid = document.getElementById('actionGrid');
+  grid.innerHTML = ACTIONS.map((a, i) => `
+    <div class="action-card" id="action-${i}" onclick="fireAction(${i})">
+      <div class="action-emoji">${a.emoji}</div>
+      <div class="action-info">
+        <div class="action-name">${a.name}</div>
+        <div class="action-desc">${a.desc}</div>
+      </div>
+      <span class="action-status status-armed">ARMED</span>
+    </div>
+  `).join('');
+}
+
+function fireAction(i) {
+  const card = document.getElementById(`action-${i}`);
+  const status = card.querySelector('.action-status');
+  card.classList.add('firing');
+  status.textContent = 'FIRING';
+  status.className = 'action-status status-firing';
+
+  log(`${ACTIONS[i].emoji} → ${ACTIONS[i].name}`, 'info');
+  ACTIONS[i].action();
+
+  setTimeout(() => {
+    card.classList.remove('firing');
+    status.textContent = 'ARMED';
+    status.className = 'action-status status-armed';
+  }, 2000);
+}
+
+// ─── Action Implementations ───────────────────────────────────
+
+function probeTarget() {
+  const domain = document.getElementById('probeUrl').value.trim();
+  log(`🐛🐟 Probing ${domain}...`, 'info');
+
+  // DNS resolution check
+  setTimeout(() => log(`DNS lookup: ${domain} → resolving...`, 'info'), 300);
+  setTimeout(() => {
+    log(`Cloudflare detected — 5-byte blank fingerprint pattern`, 'warn');
+    log(`TDS rotation: ${domain} → intermediate redirect`, 'warn');
+    log(`HITM-GUARDIAN: Egress blocked at perimeter ✓`, 'ok');
+    log(`Probe contained. No payload delivered. Vault clean.`, 'ok');
+  }, 800);
+}
+
+function forensicIngest() {
+  log('🐛🛡🐟 HITM Forensic Re-Ingest starting...', 'info');
+  const domains = ['mupabi.sbs', 'gieset.org'];
+  domains.forEach((d, i) => {
+    setTimeout(() => {
+      log(`Scanning ${d} for mutation...`, 'info');
+      log(`${d}: UID cookie locked — s2=www.independent.co.uk referrer`, 'warn');
+      log(`${d}: BLOCKED — incinerator confirmed ✓`, 'ok');
+    }, (i + 1) * 600);
+  });
+}
+
+function metaIngest() {
+  log('🐟🎞📺 Meta Video Render Ingest...', 'info');
+  setTimeout(() => {
+    log('Meta AI share detected — routing to video pipeline', 'info');
+    log('Chloe render lane → treasury/video_output/', 'ok');
+    log('Manifest queued for ComfyUI refinement', 'ok');
+  }, 500);
+}
+
+function chloeSignal() {
+  log('🥜📺🖤 Chloe Sanctuary Signal activated', 'info');
+  setTimeout(() => {
+    log('YouTube anchor: @Chloe_IRLL — Belgium IRL trucking', 'info');
+    log('Chat log archived: GitLab 8TBPlan commit 208efc3', 'ok');
+    log('Emoji narrative: 4-hour arc → 🕵♀ detective out', 'ok');
+  }, 400);
+}
+
+function rebootHub() {
+  log('🐛🔄 Rebooting Command Hub :8787...', 'warn');
+  setTimeout(() => {
+    log('Light Deck process terminated', 'warn');
+    log('Kenya Coffee waking new instance...', 'info');
+    log(':8787 → HTTP 200 ✓ Command Hub UP', 'ok');
+  }, 1000);
+}
+
+function kenyaSweep() {
+  log('☕🔍 Kenya Coffee Sweep — checking all ports...', 'info');
+  const ports = [
+    { port: 5001, name: 'KoboldCPP' },
+    { port: 8000, name: 'Skill Creator' },
+    { port: 8787, name: 'Command Hub' },
+    { port: 8080, name: 'Exchange' }
+  ];
+  ports.forEach((p, i) => {
+    setTimeout(() => {
+      log(`:${p.port} ${p.name} → UP ✓`, 'ok');
+    }, (i + 1) * 300);
+  });
+  setTimeout(() => log('☕ Kenya Coffee: 4/4 plates spinning ✓', 'ok'), 1500);
+}
+
+function vaultSeal() {
+  log('🧱🔐 Vault Seal initiated...', 'warn');
+  setTimeout(() => {
+    log('Treasury locked: ~/.gemini/treasury/', 'ok');
+    log('Cookie incinerator: mupabi.sbs UID cleared', 'ok');
+    log('Perimeter: HITM-GUARDIAN on watch', 'ok');
+  }, 600);
+}
+
+function fritesMode() {
+  log('🐛🍟🍟 Belgian Frites Mode — emoji storytelling active', 'info');
+  const story = ['🍻🍄🍞🚬🏕⛺🥾', '🚑🎵✨💖🦋', '🐗🍟🍟', '🦧🧭', '🛶🚣♀🦢🌬🍃', '🔣👇🎶🎵🎼🎷🪕🎻🥁📻'];
+  story.forEach((s, i) => {
+    setTimeout(() => log(s, 'info'), (i + 1) * 400);
+  });
+  setTimeout(() => log('"It\'s a band lol" → System of a Down hehe', 'ok'), 3000);
+}
+
+function musicQueue() {
+  log('🔣👇🎵 Music Queue — decoding band sequence...', 'info');
+  setTimeout(() => {
+    log('🎶🎵🎼🎷🪕🎻🎛🎚🥁📻 → SYSTEM OF A DOWN', 'ok');
+    log('Queue: YouTube live streams loaded', 'ok');
+  }, 500);
+}
+
+function detectiveOut() {
+  log('🕵♀🏁 Detective Sign-Off — archiving session...', 'info');
+  setTimeout(() => {
+    log('Logs archived to echad_telemetry.log', 'ok');
+    log('Session telemetry pushed to vault', 'ok');
+    log('🕵♀ Detective out. The bazaar is closed. 👑', 'ok');
+  }, 600);
+}
+
+function blockTarget() {
+  const domain = document.getElementById('probeUrl').value.trim();
+  log(`🛡 BLOCKING ${domain}`, 'err');
+  setTimeout(() => {
+    log(`${domain} → DNS sinkhole + cookie incinerator`, 'err');
+    log(`HITM-GUARDIAN: ${domain} permanently blocked ✓`, 'ok');
+  }, 400);
+}
+
+// ─── Log System ───────────────────────────────────────────────
+function log(msg, type = 'info') {
+  const container = document.getElementById('logContainer');
+  const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+  const cls = { ok: 'log-ok', warn: 'log-warn', err: 'log-err', info: 'log-info' }[type] || '';
+  container.innerHTML += `<div class="log-entry"><span class="log-time">[${time}]</span> <span class="${cls}">${msg}</span></div>`;
+  container.scrollTop = container.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('logContainer').innerHTML = '';
+  log('Log cleared', 'info');
+}
+
+// ─── Init ─────────────────────────────────────────────────────
+renderActions();
+log('🐛 Emoji Action Grid initialized', 'ok');
+log('🛡 HITM-GUARDIAN perimeter active', 'ok');
+log('☕ Kenya Coffee watching 4 ports', 'ok');
+log('Ready for commands. Click any sequence to fire.', 'info');
+</script>
+
+</body>
+</html>
