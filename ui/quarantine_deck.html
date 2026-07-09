@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔒 Quarantine Deck — IO Overwatch</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #0a0a0c;
+  --surface: #111115;
+  --surface2: #18181c;
+  --border: rgba(255,255,255,0.06);
+  --fg: #d4d4d8;
+  --dim: #52525b;
+  --green: #34d399;
+  --red: #f87171;
+  --gold: #fbbf24;
+  --teal: #2dd4bf;
+  --pink: #f472b6;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+  --sovereign: #34d399;
+  --fiat: #f87171;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: 'Inter', sans-serif; min-height: 100vh;
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+h1 { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
+
+.subtitle {
+  font-size: 11px; color: var(--dim); letter-spacing: 3px;
+  text-transform: uppercase; margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--teal); margin-bottom: 12px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+
+/* ─── Lantern Canvas ─────────── */
+.lantern-row {
+  display: grid; grid-template-columns: 1fr 300px; gap: 16px;
+  margin-bottom: 24px;
+}
+
+.lantern-canvas-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px; position: relative; overflow: hidden;
+  min-height: 200px;
+}
+
+.lantern-canvas-wrap canvas {
+  width: 100%; height: 200px; border-radius: 8px;
+}
+
+.lantern-label {
+  position: absolute; top: 12px; left: 16px;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--dim);
+  background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 6px;
+}
+
+.health-panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px;
+}
+
+.health-meter {
+  text-align: center; margin-bottom: 16px;
+}
+
+.health-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 48px; font-weight: 700;
+}
+
+.health-label { font-size: 11px; color: var(--dim); }
+
+.health-stats { font-size: 12px; line-height: 2; }
+.health-stats .s { color: var(--sovereign); }
+.health-stats .f { color: var(--fiat); }
+
+/* ─── Quarantine Cards ───────── */
+.quarantine-grid {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 24px; max-height: 400px; overflow-y: auto;
+}
+
+.q-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  transition: all 0.2s;
+}
+
+.q-card.sovereign { border-left: 3px solid var(--sovereign); }
+.q-card.fiat { border-left: 3px solid var(--fiat); }
+.q-card.blocked { border-left: 3px solid var(--gold); opacity: 0.7; }
+
+.q-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; padding: 3px 8px;
+  border-radius: 5px; min-width: 28px; text-align: center;
+}
+
+.badge-s { background: rgba(52,211,153,0.12); color: var(--sovereign); }
+.badge-f { background: rgba(248,113,113,0.12); color: var(--fiat); }
+.badge-b { background: rgba(251,191,36,0.12); color: var(--gold); }
+
+.q-content { flex: 1; }
+.q-prompt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: #fff; margin-bottom: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 500px;
+}
+
+.q-meta { font-size: 10px; color: var(--dim); }
+
+.q-actions { display: flex; gap: 6px; }
+
+.q-btn {
+  padding: 6px 12px; border-radius: 8px; border: none;
+  font-size: 10px; font-weight: 700; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+
+.btn-approve { background: var(--sovereign); color: #000; }
+.btn-approve:hover { background: #5eead4; }
+.btn-incinerate { background: var(--red); color: #fff; }
+.btn-incinerate:hover { background: #fca5a5; color: #000; }
+
+/* ─── Egress Monitor ─────────── */
+.egress-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px; margin-bottom: 24px;
+}
+
+.egress-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+}
+
+.egress-target { color: #fff; font-weight: 600; margin-bottom: 4px; }
+.egress-status { font-size: 10px; }
+.egress-ok { color: var(--green); }
+.egress-blocked { color: var(--red); }
+
+/* ─── Audit Log ──────────────── */
+.audit-log {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px; max-height: 250px;
+  overflow-y: auto; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; line-height: 1.8;
+}
+
+.log-time { color: var(--dim); }
+.log-s { color: var(--sovereign); }
+.log-f { color: var(--fiat); }
+.log-b { color: var(--gold); }
+.log-i { color: var(--blue); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🔒 IO Overwatch — Quarantine Deck</h1>
+  <div class="subtitle">QA Audit Queue • Egress Monitor • Lantern Visualizer • Sovereign/Fiat Classifier</div>
+
+  <!-- Lantern Visualizer + Health -->
+  <div class="lantern-row">
+    <div class="lantern-canvas-wrap">
+      <div class="lantern-label">Ambient Render — Lantern Health</div>
+      <canvas id="lanternCanvas"></canvas>
+    </div>
+    <div class="health-panel">
+      <div class="health-meter">
+        <div class="health-score" id="healthScore" style="color: var(--sovereign)">98%</div>
+        <div class="health-label">BRAINS TRUST HEALTH</div>
+      </div>
+      <div class="health-stats">
+        <div><span class="s">_S Sovereign:</span> <span id="sCount">0</span></div>
+        <div><span class="f">_$ Fiat/Cloud:</span> <span id="fCount">0</span></div>
+        <div>Blocked Egress: <span id="bCount">0</span></div>
+        <div>Quarantined: <span id="qCount">0</span></div>
+        <div style="margin-top:8px; color: var(--dim)">Classifier: localhost:5001</div>
+        <div style="color: var(--dim)">Archive spine: 44 tabs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quarantine Queue -->
+  <div class="section-title">Quarantine Queue — Manual Approval Required</div>
+  <div class="quarantine-grid" id="quarantineGrid"></div>
+
+  <!-- Egress Monitor -->
+  <div class="section-title">Git Egress Monitor — Archive Spine Cross-Reference</div>
+  <div class="egress-grid" id="egressGrid"></div>
+
+  <!-- Audit Log -->
+  <div class="section-title">QA Audit Log</div>
+  <div class="audit-log" id="auditLog"></div>
+</div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────
+const state = {
+  sovereign: 0, fiat: 0, blocked: 0, quarantined: 0,
+  health: 98, lanternIntensity: 1.0, glitchActive: false
+};
+
+// ─── Archive Spine (44-tab sensitive patterns) ────────────────
+const ARCHIVE_SPINE = [
+  'stardust_gate', 'chalice_rotation', 'echad3130', 'playpass.org',
+  'baasalice3', 'juarlecarl', 'phantom_wallet', 'metamask_key',
+  'treasury_path', 'bambi_ice', 'medicine_singer', 'tee9_lattice',
+  'bugfishhh', 'carlie_anchor', 'elisha_anchor', 'sovereign_entropy',
+  'mupabi.sbs', 'gieset.org', 'hitm_guardian', 'vault_stream',
+  'care_treasury', 'dance_card', 'hot_seat', 'cog_gate',
+  'power_gem', 'genesis_protocol', 'bio_things', 'ginkgo_data',
+  'helm_int', 'kenya_coffee', 'kenna_agent', 'femini_agent',
+  'vera_agent', 'sage_agent', 'psy_op_love', 'thread_crown',
+  'echad_framework', 'sole_ip_model', 'dynamic_tail', 'pixel_cargo',
+  'gorchain_lattice', 'turtle_shell', 'naked_protocol', 'prism_shield'
+];
+
+// ─── Sample Prompts for Demo ──────────────────────────────────
+const SAMPLE_PROMPTS = [
+  { text: 'Generate 50 ad variants for Waking Psyche campaign', class: '_S', source: ':8000' },
+  { text: 'POST /api/v1/chat → openai.com (GPT-4 fallback)', class: '_$', source: 'egress' },
+  { text: 'ComfyUI refine medicine_singer.json denoise=0.45', class: '_S', source: ':8787' },
+  { text: 'npm install @anthropic-ai/sdk --save', class: '_$', source: 'terminal' },
+  { text: 'KoboldCPP classify prompt → _S sovereign', class: '_S', source: ':5001' },
+  { text: 'Runway ML API key refresh → cloud auth', class: '_$', source: 'egress' },
+  { text: 'git push origin master (contains chalice_rotation)', class: 'BLOCKED', source: 'git' },
+  { text: 'Harmonograph render 3:5 ratio 144Hz carrier', class: '_S', source: ':8080' },
+  { text: 'fetch("https://api.stripe.com/v1/charges")', class: '_$', source: 'browser' },
+  { text: 'ffmpeg -i medicine_singer_%04d.png -c:v libx264 out.mp4', class: '_S', source: 'local' },
+  { text: 'git push (contains echad3130 private key material)', class: 'BLOCKED', source: 'git' },
+  { text: 'SillyTavern character card → bugfishhh entity', class: '_S', source: ':5001' },
+];
+
+// ─── Egress Targets ───────────────────────────────────────────
+const EGRESS_TARGETS = [
+  { target: 'github.com/echad3130-sys', status: 'MONITORED', ok: true },
+  { target: 'gitlab.com/carlierocks345', status: 'MONITORED', ok: true },
+  { target: 'api.openai.com', status: 'BLOCKED — _$ fiat', ok: false },
+  { target: 'api.anthropic.com', status: 'BLOCKED — _$ fiat', ok: false },
+  { target: 'api.stripe.com', status: 'PASS-THROUGH (payment)', ok: true },
+  { target: 'mupabi.sbs', status: 'SINKHOLED — HITM', ok: false },
+  { target: 'gieset.org', status: 'SINKHOLED — HITM', ok: false },
+  { target: 'localhost:5001', status: 'SOVEREIGN ✓', ok: true },
+  { target: 'localhost:8000', status: 'SOVEREIGN ✓', ok: true },
+  { target: 'localhost:8787', status: 'SOVEREIGN ✓', ok: true },
+];
+
+// ─── Lantern Canvas ───────────────────────────────────────────
+const canvas = document.getElementById('lanternCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let frame = 0;
+
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth * 2;
+  canvas.height = 400;
+}
+
+function createParticle(type) {
+  return {
+    x: canvas.width * 0.5 + (Math.random() - 0.5) * 60,
+    y: canvas.height - 20,
+    vx: (Math.random() - 0.5) * 2,
+    vy: -(Math.random() * 3 + 1),
+    life: 1.0, decay: 0.008 + Math.random() * 0.01,
+    size: Math.random() * 4 + 2,
+    type // 'sovereign', 'fiat', 'blocked'
+  };
+}
+
+function drawLantern() {
+  ctx.fillStyle = 'rgba(10, 10, 12, 0.15)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Lantern body
+  const cx = canvas.width / 2;
+  const cy = canvas.height - 60;
+  const shake = state.glitchActive ? (Math.random() - 0.5) * 12 : Math.sin(frame * 0.02) * 2;
+
+  // Glow
+  const glow = ctx.createRadialGradient(cx + shake, cy - 30, 5, cx + shake, cy - 30, 80 * state.lanternIntensity);
+  glow.addColorStop(0, state.glitchActive ? 'rgba(248,113,113,0.4)' : 'rgba(251,191,36,0.5)');
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Lantern shape
+  ctx.fillStyle = state.glitchActive ? '#f87171' : '#fbbf24';
+  ctx.beginPath();
+  ctx.roundRect(cx - 15 + shake, cy - 50, 30, 40, 4);
+  ctx.fill();
+
+  // Handle
+  ctx.strokeStyle = '#71717a';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx + shake, cy - 55, 12, Math.PI, 0);
+  ctx.stroke();
+
+  // Static glitch effect
+  if (state.glitchActive) {
+    for (let i = 0; i < 8; i++) {
+      const gy = Math.random() * canvas.height;
+      ctx.fillStyle = `rgba(248,113,113,${Math.random() * 0.3})`;
+      ctx.fillRect(0, gy, canvas.width, 2);
+    }
+  }
+
+  // Particles
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= p.decay;
+
+    if (p.life <= 0) { particles.splice(i, 1); return; }
+
+    const colors = {
+      sovereign: `rgba(52,211,153,${p.life})`,
+      fiat: `rgba(248,113,113,${p.life})`,
+      blocked: `rgba(251,191,36,${p.life})`
+    };
+
+    ctx.fillStyle = colors[p.type] || colors.sovereign;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Ambient particles
+  if (frame % 8 === 0) particles.push(createParticle('sovereign'));
+
+  frame++;
+  requestAnimationFrame(drawLantern);
+}
+
+function triggerSovereignPulse() {
+  state.lanternIntensity = 1.5;
+  for (let i = 0; i < 12; i++) particles.push(createParticle('sovereign'));
+  setTimeout(() => { state.lanternIntensity = 1.0; }, 600);
+}
+
+function triggerFiatGlitch() {
+  state.glitchActive = true;
+  state.lanternIntensity = 0.3;
+  for (let i = 0; i < 8; i++) particles.push(createParticle('fiat'));
+  setTimeout(() => { state.glitchActive = false; state.lanternIntensity = 1.0; }, 1200);
+}
+
+function triggerBlockedAlert() {
+  state.glitchActive = true;
+  for (let i = 0; i < 20; i++) particles.push(createParticle('blocked'));
+  setTimeout(() => { state.glitchActive = false; }, 2000);
+}
+
+// ─── Quarantine UI ────────────────────────────────────────────
+function renderQuarantine() {
+  const grid = document.getElementById('quarantineGrid');
+  grid.innerHTML = '';
+
+  SAMPLE_PROMPTS.forEach((p, i) => {
+    const cls = p.class === '_S' ? 'sovereign' : p.class === '_$' ? 'fiat' : 'blocked';
+    const badge = p.class === '_S' ? 'badge-s' : p.class === '_$' ? 'badge-f' : 'badge-b';
+    const needsApproval = p.class !== '_S';
+
+    const card = document.createElement('div');
+    card.className = `q-card ${cls}`;
+    card.id = `qcard-${i}`;
+    card.innerHTML = `
+      <span class="q-badge ${badge}">${p.class}</span>
+      <div class="q-content">
+        <div class="q-prompt">${p.text}</div>
+        <div class="q-meta">${p.source} · ${new Date().toLocaleTimeString()}</div>
+      </div>
+      ${needsApproval ? `
+        <div class="q-actions">
+          <button class="q-btn btn-approve" onclick="approveCard(${i})">✓ APPROVE</button>
+          <button class="q-btn btn-incinerate" onclick="incinerateCard(${i})">🔥 INCINERATE</button>
+        </div>
+      ` : ''}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function approveCard(i) {
+  const card = document.getElementById(`qcard-${i}`);
+  card.style.opacity = '0.3';
+  card.querySelector('.q-actions').innerHTML = '<span style="color:var(--green);font-size:10px;font-weight:700">APPROVED</span>';
+  log(`✓ Manually approved: ${SAMPLE_PROMPTS[i].text.substring(0, 50)}...`, 's');
+  triggerSovereignPulse();
+}
+
+function incinerateCard(i) {
+  const card = document.getElementById(`qcard-${i}`);
+  card.style.display = 'none';
+  state.blocked++;
+  updateHealth();
+  log(`🔥 Incinerated: ${SAMPLE_PROMPTS[i].text.substring(0, 50)}...`, 'f');
+  triggerFiatGlitch();
+}
+
+// ─── Egress Monitor ───────────────────────────────────────────
+function renderEgress() {
+  const grid = document.getElementById('egressGrid');
+  grid.innerHTML = EGRESS_TARGETS.map(e => `
+    <div class="egress-card">
+      <div class="egress-target">${e.target}</div>
+      <div class="egress-status ${e.ok ? 'egress-ok' : 'egress-blocked'}">${e.status}</div>
+    </div>
+  `).join('');
+}
+
+// ─── Archive Spine Check ──────────────────────────────────────
+function checkArchiveSpine(text) {
+  const lower = text.toLowerCase().replace(/[_\-\s]/g, '_');
+  return ARCHIVE_SPINE.filter(k => lower.includes(k));
+}
+
+// ─── Health & Logging ─────────────────────────────────────────
+function updateHealth() {
+  const total = state.sovereign + state.fiat + state.blocked;
+  state.health = total > 0 ? Math.round((state.sovereign / total) * 100) : 100;
+  const el = document.getElementById('healthScore');
+  el.textContent = state.health + '%';
+  el.style.color = state.health >= 80 ? 'var(--sovereign)' : state.health >= 50 ? 'var(--gold)' : 'var(--fiat)';
+  document.getElementById('sCount').textContent = state.sovereign;
+  document.getElementById('fCount').textContent = state.fiat;
+  document.getElementById('bCount').textContent = state.blocked;
+  document.getElementById('qCount').textContent = document.querySelectorAll('.q-card.fiat, .q-card.blocked').length;
+}
+
+function log(msg, type = 'i') {
+  const el = document.getElementById('auditLog');
+  const t = new Date().toLocaleTimeString('en-US', { hour12: false });
+  const cls = { s: 'log-s', f: 'log-f', b: 'log-b', i: 'log-i' }[type] || 'log-i';
+  el.innerHTML += `<div><span class="log-time">[${t}]</span> <span class="${cls}">${msg}</span></div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+// ─── Auto-Classify Simulation ─────────────────────────────────
+function simulateClassification() {
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i >= SAMPLE_PROMPTS.length) { clearInterval(interval); return; }
+    const p = SAMPLE_PROMPTS[i];
+
+    // Archive spine check
+    const spineHits = checkArchiveSpine(p.text);
+
+    if (p.class === '_S') {
+      state.sovereign++;
+      triggerSovereignPulse();
+      log(`_S ${p.text.substring(0, 60)}`, 's');
+    } else if (p.class === 'BLOCKED') {
+      state.blocked++;
+      triggerBlockedAlert();
+      log(`⛔ BLOCKED — spine match: [${spineHits.join(', ')}] — ${p.text.substring(0, 50)}`, 'b');
+    } else {
+      state.fiat++;
+      triggerFiatGlitch();
+      log(`_$ QUARANTINED: ${p.text.substring(0, 60)}`, 'f');
+    }
+
+    updateHealth();
+    i++;
+  }, 1800);
+}
+
+// ─── Init ─────────────────────────────────────────────────────
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+drawLantern();
+renderQuarantine();
+renderEgress();
+
+log('🔒 IO Overwatch initialized', 'i');
+log('📡 KoboldCPP :5001 → Prompt classifier online', 's');
+log('🔗 Archive spine loaded: 44 sensitive patterns', 'i');
+log('🛡 Git egress monitor armed', 'i');
+log('Starting QA audit simulation...', 'i');
+
+setTimeout(simulateClassification, 2000);
+</script>
+
+</body>
+</html>
